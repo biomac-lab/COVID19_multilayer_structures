@@ -255,7 +255,7 @@ def simulate_intervals(
         recovery_probabilities, state, state_timer, key, epoch_len,
         states_cumulative)
     history.extend(history_)
-    print('Completed interval {} of {}'.format(t+1, len(ws)))
+    #print('Completed interval {} of {}'.format(t+1, len(ws)))
 
   return key, state, state_timer, states_cumulative, history
 
@@ -393,14 +393,19 @@ def plot_single_daily(daily_incidence,n,ymax=1,scale=1,int=0,Tint=0,plotThis=Fal
   	plt.savefig(plotName+'.pdf',bbox_inches='tight')
   plt.show()
 
-def get_peaks_single(history,tvec,int=0,Tint=0):
+
+
+def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
 
   """
-  calculates the peak prevalence for a single run, with or without an intervention
-  history: 2D array of values for each variable at each timepoint
+  calculates the peak prevalence for a multiple runs, with or without an intervention
+  soln: 3D array of values for each iteration for each variable at each timepoint
   tvec: 1D vector of timepoints
+  ymax : highest value on y axis, relative to "scale" value (e.g. 0.5 makes ymax=0.5 or 50% for scale=1 or N)
+  scale: amount to multiple all frequency values by (e.g. "1" keeps as frequency, "N" turns to absolute values)
   int: Optional, 1 or 0 for whether or not there was an intervention. Defaults to 0
   Tint: Optional, timepoint (days) at which intervention was started
+  loCI,upCI: Optional, upper and lower percentiles for confidence intervals. Defaults to 90% interval
   """
 
   delta_t=tvec[1]-tvec[0]
@@ -409,39 +414,69 @@ def get_peaks_single(history,tvec,int=0,Tint=0):
     time_int=0
   else:
     time_int=Tint
-      
+
+  all_cases=soln[:,:,1]+soln[:,:,2]+soln[:,:,3]+soln[:,:,4]
+
+  # final_recovered = {'avrg':100 * np.average(soln[:,-1,6]),
+  #                    'int1':100*np.percentile(soln[:,-1,6],loCI),
+  #                    'int2':100*np.percentile(soln[:,-1,6],upCI)}
+  # final_deaths    = {'avrg':100 * np.average(soln[:,-1,5]),
+  #                     'int1':100*np.percentile(soln[:,-1,5],loCI),
+  #                     'int2':100*np.percentile(soln[:,-1,5],upCI)}
+  # remain_infec    = {'avrg':100 * np.average(all_cases[:,-1]),
+  #                     'int1':100*np.percentile(all_cases[:,-1],loCI),
+  #                     'int2':100*np.percentile(all_cases[:,-1],upCI)}
+
   # Final values
-  print('Final recovered: {:3.1f}%'.format(100 * history[-1][6]))
-  print('Final deaths: {:3.1f}%'.format(100 * history[-1][5]))
-  print('Remaining infections: {:3.1f}%'.format(
-      100 * np.sum(history[-1][1:5], axis=-1)))
+  print('Final recovered: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100 * np.average(soln[:,-1,6]), 100*np.percentile(soln[:,-1,6],loCI), 100*np.percentile(soln[:,-1,6],upCI)))
+  print('Final deaths: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100 * np.average(soln[:,-1,5]), 100*np.percentile(soln[:,-1,5],loCI), 100*np.percentile(soln[:,-1,5],upCI)))
+  print('Remaining infections: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100*np.average(all_cases[:,-1]),100*np.percentile(all_cases[:,-1],loCI),100*np.percentile(all_cases[:,-1],upCI)))
 
   # Peak prevalence
-  print('Peak I1: {:3.1f}%'.format(
-      100 * np.max(history[:, 2])))
-  print('Peak I2: {:3.1f}%'.format(
-      100 * np.max(history[:, 3])))
-  print('Peak I3: {:3.1f}%'.format(
-      100 * np.max(history[:, 4])))
+  peaks=np.amax(soln[:,:,2],axis=1)
 
-  # Time of peaks
-  print('Time of peak I1: {:3.1f} days'.format(
-      np.argmax(history[:, 2])*delta_t - time_int))
-  print('Time of peak I2: {:3.1f} days'.format(
-      np.argmax(history[:, 3])*delta_t - time_int))
-  print('Time of peak I3: {:3.1f} days'.format(
-      np.argmax(history[:, 4])*delta_t - time_int))
+  # preaks_I1        = {'avrg':100 * np.average(peaks),
+  #                    'int1':100 * np.percentile(peaks,loCI),
+  #                    'int2':100 * np.percentile(peaks,upCI)}
+  # preaks_I1        = {'avrg':100 * np.average(peaks),
+  #                     'int1':100 * np.percentile(peaks,loCI),
+  #                     'int2':100 * np.percentile(peaks,upCI)}
+  # preaks_I1        = {'avrg':100 * np.average(peaks),
+  #                     'int1':100 * np.percentile(peaks,loCI),
+  #                     'int2':100 * np.percentile(peaks,upCI)}
+
+
+  print('Peak I1: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
+  peaks=np.amax(soln[:,:,3],axis=1)
+  print('Peak I2: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
+  peaks=np.amax(soln[:,:,4],axis=1)
+  print('Peak I3: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
+      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
   
-  # First time when all infections go extinct
-  all_cases=history[:, 1]+history[:, 2]+history[:, 3]+history[:, 4]
-  extinct=np.where(all_cases == 0)[0]
-  if len(extinct) != 0:
-    extinction_time=np.min(extinct)*delta_t - time_int
-    print('Time of extinction of all infections: {:3.1f} days'.format(extinction_time))
-  else:
-     print('Infections did not go extinct by end of simulation')
- 
+  # Timing of peaks
+  tpeak=np.argmax(soln[:,:,2],axis=1)*delta_t-time_int
+  print('Time of peak I1: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
+      np.average(tpeak),np.median(tpeak), np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
+  tpeak=np.argmax(soln[:,:,3],axis=1)*delta_t-time_int
+  print('Time of peak I2: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
+      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
+  tpeak=np.argmax(soln[:,:,4],axis=1)*delta_t-time_int
+  print('Time of peak I3: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
+      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
+  
+  # Time when all the infections go extinct
+  time_all_extinct = np.array(get_extinction_time(all_cases,0))*delta_t-time_int
+
+  print('Time of extinction of all infections post intervention: {:4.2f} days  [{:4.2f}, {:4.2f}]'.format(
+      np.average(time_all_extinct),np.percentile(time_all_extinct,loCI),np.percentile(time_all_extinct,upCI)))
+  
   return
+
 
 def get_peaks_single_daily(daily_incidence,int=0,Tint=0):
 
@@ -832,112 +867,6 @@ def get_extinction_time(sol, t):
 
   return extinction_time
 
-def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
-
-  """
-  calculates the peak prevalence for a multiple runs, with or without an intervention
-  soln: 3D array of values for each iteration for each variable at each timepoint
-  tvec: 1D vector of timepoints
-  ymax : highest value on y axis, relative to "scale" value (e.g. 0.5 makes ymax=0.5 or 50% for scale=1 or N)
-  scale: amount to multiple all frequency values by (e.g. "1" keeps as frequency, "N" turns to absolute values)
-  int: Optional, 1 or 0 for whether or not there was an intervention. Defaults to 0
-  Tint: Optional, timepoint (days) at which intervention was started
-  loCI,upCI: Optional, upper and lower percentiles for confidence intervals. Defaults to 90% interval
-  """
-
-  delta_t=tvec[1]-tvec[0]
-
-  if int==0:
-    time_int=0
-  else:
-    time_int=Tint
-
-  all_cases=soln[:,:,1]+soln[:,:,2]+soln[:,:,3]+soln[:,:,4]
-
-  # Final values
-  print('Final recovered: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(soln[:,-1,6]), 100*np.percentile(soln[:,-1,6],loCI), 100*np.percentile(soln[:,-1,6],upCI)))
-  print('Final deaths: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(soln[:,-1,5]), 100*np.percentile(soln[:,-1,5],loCI), 100*np.percentile(soln[:,-1,5],upCI)))
-  print('Remaining infections: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100*np.average(all_cases[:,-1]),100*np.percentile(all_cases[:,-1],loCI),100*np.percentile(all_cases[:,-1],upCI)))
-
-  # Peak prevalence
-  peaks=np.amax(soln[:,:,2],axis=1)
-  print('Peak I1: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  peaks=np.amax(soln[:,:,3],axis=1)
-  print('Peak I2: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  peaks=np.amax(soln[:,:,4],axis=1)
-  print('Peak I3: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  
-  # Timing of peaks
-  tpeak=np.argmax(soln[:,:,2],axis=1)*delta_t-time_int
-  print('Time of peak I1: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak), np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
-  tpeak=np.argmax(soln[:,:,3],axis=1)*delta_t-time_int
-  print('Time of peak I2: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
-  tpeak=np.argmax(soln[:,:,4],axis=1)*delta_t-time_int
-  print('Time of peak I3: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
-  
-  # Time when all the infections go extinct
-  time_all_extinct = np.array(get_extinction_time(all_cases,0))*delta_t-time_int
-
-  print('Time of extinction of all infections post intervention: {:4.2f} days  [{:4.2f}, {:4.2f}]'.format(
-      np.average(time_all_extinct),np.percentile(time_all_extinct,loCI),np.percentile(time_all_extinct,upCI)))
-  
-  return
-
-def get_peaks_iter_daily(soln_inc,int=0,Tint=0,loCI=5,upCI=95):
-
-  """
-  calculates the peak daily incidence for a multiple runs, with or without an intervention
-  soln_inc: 3D array of values for each iteration for each variable at each timepoint
-  ymax : highest value on y axis, relative to "scale" value (e.g. 0.5 makes ymax=0.5 or 50% for scale=1 or N)
-  scale: amount to multiple all frequency values by (e.g. "1" keeps as frequency, "N" turns to absolute values)
-  int: Optional, 1 or 0 for whether or not there was an intervention. Defaults to 0
-  Tint: Optional, timepoint (days) at which intervention was started
-  loCI,upCI: Optional, upper and lower percentiles for confidence intervals. Defaults to 90% interval
-  """
-
-  if int==0:
-    time_int=0
-  else:
-    time_int=Tint
-
-  # Peak incidence
-  peaks=np.amax(soln_inc[:,:,2],axis=1)
-  print('Peak daily I1: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  peaks=np.amax(soln_inc[:,:,3],axis=1)
-  print('Peak daily I2: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  peaks=np.amax(soln_inc[:,:,4],axis=1)
-  print('Peak daily I3: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  peaks=np.amax(soln_inc[:,:,5],axis=1)
-  print('Peak daily deaths: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
-      100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-
-  # Timing of peak incidence  
-  tpeak=np.argmax(soln_inc[:,:,2],axis=1)+1.0-time_int
-  print('Time of peak I1: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,5.0),np.percentile(tpeak,95.0)))
-  tpeak=np.argmax(soln_inc[:,:,3],axis=1)+1.0-time_int
-  print('Time of peak I2: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,5.0),np.percentile(tpeak,95.0)))
-  tpeak=np.argmax(soln_inc[:,:,4],axis=1)+1.0-time_int
-  print('Time of peak I3: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,5.0),np.percentile(tpeak,95.0)))
-  tpeak=np.argmax(soln_inc[:,:,5],axis=1)+1.0-time_int
-  print('Time of peak deaths: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
-      np.average(tpeak),np.median(tpeak),np.percentile(tpeak,5.0),np.percentile(tpeak,95.0)))
-
-  return
 
 def smooth_timecourse(soln,o):
   """
@@ -963,114 +892,3 @@ def moving_average(x, o):
   z=y[o:-o]/den
   return z
 
-def prob_inf_house_size_iter(state, hh_sizes_, house_dist):
-  """ Function that computes the probability of an individual getting infected given their household size.
-  @param state : A Device Array that encodes the state of each individual in the population at the end of each iteration of the simulation
-  @type : Device Array of shape (# of iterations, population size)
-  @param hh_sizes_ : An array which keeps track of the size of each individual's household
-  @type : Array of length = population size
-  @param house_dist : Distribution of household sizes 
-  @type : List or 1D array
-  @return : Returns the probability of infection given household size and the mean probability of infection
-  @type : Tuple
-  """
-  hh_sizes = np.asarray(hh_sizes_)
-  iterations = len(state)
-  prob_hh_size = np.zeros((iterations, len(house_dist)))
-  pop = len(state[0])
-  mean_inf_prob = np.zeros(iterations)
-  
-  # First compute the probability of the household size given that the person was infected and then use Bayes rule
-  for i in range(iterations):
-    if_inf = np.where(state[i] > 0)[0]
-    inf_size = len(if_inf)
-    hh_inf = hh_sizes[if_inf]
-    prob = ((np.array(np.unique(hh_inf, return_counts= True))[-1])/inf_size) * (inf_size/pop) * (1/house_dist) # Bayes rule
-    prob_hh_size = index_add(prob_hh_size, i, prob)
-    mean_inf_prob = index_add(mean_inf_prob, i, inf_size/pop)
-
-  # Returns the probability of infection given household size
-  return np.average(prob_hh_size, axis = 0) , np.average(mean_inf_prob)
-
-def prob_inf_workplace_open(indx_active, state):
-  """ Function that computes the probability of infection for an individual who is still working during intervention.
-  @param indx_active : Numpy array with indices of individuals still working during intervention
-  @type : 1D array
-  @param state : A Device Array that encodes the state of each individual in the population at the end of each iteration of the simulation
-  @type : Device Array of shape (# of iterations, population size)
-  @return : Returns the probability of infection for individuals working during intervention and the population average, averaged over the number of iterations
-  @type : Tuple
-  """
-  iterations = len(state)
-  prob_inf_work = np.zeros(iterations)
-  pop = len(state[0])
-  mean_inf_prob = np.zeros(iterations)
-
-  for i in range(iterations):
-
-    # Get indices of infected people
-    if_inf = np.where(state[i] > 0)[0]
-    inf_size = len(if_inf)
-    
-    # Calculate the conditional probability
-    prob = (sum(np2.isin(indx_active, if_inf))/inf_size) * (inf_size/pop) * (pop/len(indx_active))
-    prob_inf_work = index_add(prob_inf_work, i, prob)
-    mean_inf_prob = index_add(mean_inf_prob, i, inf_size/pop)
-
-  return np.average(prob_inf_work), np.average(mean_inf_prob)
-
-def prob_inf_working_hh_member(indx_active, state, house_indices, household_sizes):
-    """ Function that computes the probability of infection for individuals living with a household member working during intervention along with the probability of infection for individuals who aren't working and
-    living with a working household member.
-    @param indx_active : Numpy array with indices of individuals still working during intervention
-    @type : 1D array
-    @param state : A Device Array that encodes the state of each individual in the population at the end of each iteration of the simulation
-    @type : Device Array of shape (# of iterations, population size)
-    @param house_indices : Numpy array that keeps track of the house an individual belongs to
-    @type : 1D array
-    @param household_sizes : Numpy array that keeps track of the size of each individual's household
-    @type : 1D array
-    @return : Returns the probability of infection for individuals living with working household members, probability for non-workers living with no working household member, and the population average, averaged over the number of iterations
-    @type : Tuple
-    """
-    iterations = len(state)
-    prob_inf = np.zeros(iterations)
-    prob_inf_not_working = np.zeros(iterations)
-    pop = len(state[0])
-    mean_inf_prob = np.zeros(iterations)
-
-    for i in range(iterations):
-
-        # Get indices of infected people
-        if_inf = np.where(state[i] > 0)[0]
-        inf_size = len(if_inf)
-
-        # Houses of people who are still working 
-        house_working = np2.unique(house_indices[indx_active])
-        
-        # Indices of all people who aren't working and their house index
-        not_working = np2.setdiff1d(np2.arange(0, pop, 1), indx_active)
-        house_not_working = house_indices[not_working]
-
-        # Probability of living with atleast one working household member
-        prob_house_working = (sum(np2.isin(house_not_working, house_working))/pop)
-
-        # Probability of living no working household member
-        prob_house_not_working = (sum(~np2.isin(house_not_working, house_working))/pop)
-
-        # Indices of infected people who aren't working and their house index
-        if_inf_not_working = np2.setdiff1d(if_inf, indx_active)
-        house_inf_not_working = house_indices[if_inf_not_working]
-
-        # Probability of infection given atleast one hh member was working during intervention
-        prob_1 = (sum(np2.isin(house_inf_not_working, house_working))/inf_size) * (inf_size/pop) * (1/prob_house_working)
-        prob_inf = index_add(prob_inf, i, prob_1)
-
-        # Probability of infection given no hh member was working during intervention
-        prob_2 = (sum(~np2.isin(house_inf_not_working, house_working))/inf_size) * (inf_size/pop) * (1/prob_house_not_working)
-        prob_inf_not_working = index_add(prob_inf_not_working, i, prob_2)
-
-        # Population average probability of infection
-        mean_inf_prob = index_add(mean_inf_prob, i, inf_size/pop)
-
-    return np.average(prob_inf), np.average(prob_inf_not_working), np.average(mean_inf_prob)
