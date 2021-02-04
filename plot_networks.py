@@ -11,16 +11,14 @@ config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
 houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
-number_nodes = int(config_data.loc['number_nodes'][1])
-pop = number_nodes
 
 # from networks import networks
 from networks import create_networks
 
 import argparse
 parser = argparse.ArgumentParser(description='Networks visualization.')
-parser.add_argument('--layers', default=4, 
-                    help='Speficy the number of layers')
+parser.add_argument('--population', default=1000, type=int,
+                    help='Speficy the number of individials')
 
 parser.add_argument('--schools_mean', default=9.4, type=float,
                     help='Schools degree distribution (mean)')
@@ -57,6 +55,11 @@ parser.add_argument('--delta_t', default=0.1, type=float,
                     help='Time stamp')  
                                          
 args = parser.parse_args()
+
+
+number_nodes = args.population
+pop = number_nodes
+
 
 ### Get age distribution
 ages_data_BOG = pd.read_csv(ages_data_path, encoding= 'unicode_escape', delimiter=';')
@@ -317,13 +320,13 @@ multilayer4_l = ['household_G','school_G','work_G','community_G']
 # Plot and save
 print('Creating figures')
 for i in tqdm(range(0,len(multilayer4_G))):
-    plt.figure(figsize=(12,12))
+    plt.figure(figsize=(20,20))
     pos = nx.kamada_kawai_layout(multilayer4_G[i])
     nx.draw(G=multilayer4_G[i], pos=pos, 
-        node_size=12,
+        node_size=6,
         node_color= 'black',
         edge_color='gray',
-        width=.2,
+        width=.15,
         edge_cmap=plt.cm.Blues, with_labels=False)
     plt.savefig(os.path.join(figures_path, str(pop)+'_{}.png'.format(multilayer4_l[i])), dpi=400, transparent=False, bbox_inches = 'tight', pad_inches = 0.1)
 

@@ -4,7 +4,7 @@ import numpy as np2
 from jax import random
 from networks import create_networks
 
-def morning_set(Graphs_matrix, hh_occupation=9.0):
+def morning_set(Graphs_matrix, hh_occupation=0.9):
 
     # load networks
     matrix_household = Graphs_matrix[0]
@@ -64,7 +64,7 @@ def morning_set(Graphs_matrix, hh_occupation=9.0):
     return w
 
 
-def evening_set(Graphs_matrix):
+def evening_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
 
     # load networks
     matrix_household = Graphs_matrix[0]
@@ -103,7 +103,7 @@ def evening_set(Graphs_matrix):
 
     return w
 
-def night_set(Graphs_matrix,hh_occupation=7.0):
+def night_set(Graphs_matrix,hh_occupation=0.7):
 
     # load networks
     matrix_household = Graphs_matrix[0]

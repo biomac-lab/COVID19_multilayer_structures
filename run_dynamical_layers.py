@@ -1,3 +1,4 @@
+#!
 import jax.numpy as np
 from jax import jit, random, vmap
 from jax.ops import index_add, index_update, index
@@ -10,11 +11,13 @@ from tqdm import tqdm
 import numpy as np2
 import pandas as pd
 import pickle
+import os
 
 from models import model
 
 config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
+results_path = config_data.loc['results_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
 houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
 
@@ -292,10 +295,10 @@ age_group_work = np2.random.choice(np.arange(0,len(work_),1),size=working,p=p,re
 for i in range(working):
     age_tracker[work_indx[i]] = age_group_work[i]
 
+print('Creating graphs...')
 
 ## Households
 matrix_household = create_networks.create_fully_connected(household_sizes,np2.arange(0,pop,1),args.R0,args.MILDINF_DURATION,args.delta_t)
-# matrix_household = networks.create_fully_connected(household_sizes,np2.arange(0,pop,1))
 
 # Get row, col, data information from the sparse matrices
 # Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
@@ -336,7 +339,9 @@ step_intervals = [int(x/delta_t) for x in days_intervals]
 total_steps = sum(step_intervals)
 
 # Create dynamic
-import network_dynamics as nd
+import networks.network_dynamics as nd
+
+print('Creating dynamics...')
 
 time_intervals, ws = nd.create_day_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps)
 
@@ -348,7 +353,7 @@ BOG_D = int(11787*(pop/total_pop_BOG))
 
 
 ####################### RUN
-
+print('Simulating...')
 soln=np.zeros((args.number_trials,total_steps,7))
 soln_cum=np.zeros((args.number_trials,total_steps,7))
 
@@ -384,9 +389,22 @@ soln_avg=np.average(soln,axis=0)
 soln_loCI=np.percentile(soln,loCI,axis=0)
 soln_upCI=np.percentile(soln,upCI,axis=0)
 
+print('Saving results...')
+
 # Save results
+
+df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+df_results_history['tvec']  = list(tvec[:soln.shape[1]])
+df_results_history['S']     = list(history[:,0])
+df_results_history['E']     = list(history[:,1])
+df_results_history['I1']    = list(history[:,2])
+df_results_history['I2']    = list(history[:,3])
+df_results_history['I3']    = list(history[:,4])
+df_results_history['D']     = list(history[:,5])
+df_results_history['R']     = list(history[:,6])
+
 df_results_mean = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_mean['tvec']  = list(tvec[:1800])
+df_results_mean['tvec']  = list(tvec[:soln.shape[1]])
 df_results_mean['S']     = list(soln_avg[:,0])
 df_results_mean['E']     = list(soln_avg[:,1])
 df_results_mean['I1']    = list(soln_avg[:,2])
@@ -396,7 +414,7 @@ df_results_mean['D']     = list(soln_avg[:,5])
 df_results_mean['R']     = list(soln_avg[:,6])
 
 df_results_loCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_loCI['tvec']  = list(tvec[:1800])
+df_results_loCI['tvec']  = list(tvec[:soln.shape[1]])
 df_results_loCI['S']     = list(soln_loCI[:,0])
 df_results_loCI['E']     = list(soln_loCI[:,1])
 df_results_loCI['I1']    = list(soln_loCI[:,2])
@@ -406,7 +424,7 @@ df_results_loCI['D']     = list(soln_loCI[:,5])
 df_results_loCI['R']     = list(soln_loCI[:,6])
 
 df_results_upCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_upCI['tvec']  = list(tvec[:1800])
+df_results_upCI['tvec']  = list(tvec[:soln.shape[1]])
 df_results_upCI['S']     = list(soln_upCI[:,0])
 df_results_upCI['E']     = list(soln_upCI[:,1])
 df_results_upCI['I1']    = list(soln_upCI[:,2])
@@ -416,12 +434,21 @@ df_results_upCI['D']     = list(soln_upCI[:,5])
 df_results_upCI['R']     = list(soln_upCI[:,6])
 
 
-# tvec=np.arange(0,Tmax,0.1)
+if not os.path.isdir( os.path.join(results_path, str(number_nodes)) ):
+        os.makedirs(os.path.join(results_path, str(number_nodes)))
 
-model.plot_iter_shade(soln,tvec[:1800],pop,ymax=1,scale=1,plotThis=True)
-#model.plot_iter_shade(soln,tvec,n,ymax=0.01,scale=100)
+path_save = os.path.join(results_path, str(number_nodes))
+
+df_results_mean.to_csv(path_save+'/{}_history.csv'.format(str(number_nodes)), index=False)
+df_results_mean.to_csv(path_save+'/{}_mean.csv'.format(str(number_nodes)), index=False)
+df_results_loCI.to_csv(path_save+'/{}_loCI.csv'.format(str(number_nodes)), index=False)
+df_results_upCI.to_csv(path_save+'/{}_upCI.csv'.format(str(number_nodes)), index=False)
+
+
+# Save other statistics
 per_day = int(1/delta_t)
 soln_smooth=model.smooth_timecourse(soln,int(per_day/2)) # Smoothening over a day
 model.get_peaks_iter(soln_smooth,tvec)
-plt.show()
 
+
+print('Done!')
