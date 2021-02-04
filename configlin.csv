@@ -1,0 +1,4 @@
+figures_dir,/home/samueltof/Documents/Projects/Multilayer_COVID19/GCP/figures
+bogota_age_data_dir,/home/samueltof/Documents/Projects/Multilayer_COVID19/GCP/data/BogotaAgeStructure.txt
+bogota_houses_data_dir,/home/samueltof/Documents/Projects/Multilayer_COVID19/GCP/data/HousesCensusBOG.CSV
+number_nodes,1000
