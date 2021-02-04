@@ -334,7 +334,6 @@ multilayer_matrix = [matrix_household,matrix_school,matrix_work,matrix_community
 Tmax = args.Tmax
 days_intervals = [1] * Tmax
 delta_t = args.delta_t
-tvec = np.arange(0,Tmax,delta_t)
 step_intervals = [int(x/delta_t) for x in days_intervals]
 total_steps = sum(step_intervals)
 
@@ -392,19 +391,20 @@ soln_upCI=np.percentile(soln,upCI,axis=0)
 print('Saving results...')
 
 # Save results
+tvec = np.linspace(0,Tmax,total_steps)
 
-df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_history['tvec']  = list(tvec[:soln.shape[1]])
-df_results_history['S']     = list(history[:,0])
-df_results_history['E']     = list(history[:,1])
-df_results_history['I1']    = list(history[:,2])
-df_results_history['I2']    = list(history[:,3])
-df_results_history['I3']    = list(history[:,4])
-df_results_history['D']     = list(history[:,5])
-df_results_history['R']     = list(history[:,6])
+# df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_history['tvec']  = list(tvec[:soln.shape[1]])
+# df_results_history['S']     = list(history[:,0])
+# df_results_history['E']     = list(history[:,1])
+# df_results_history['I1']    = list(history[:,2])
+# df_results_history['I2']    = list(history[:,3])
+# df_results_history['I3']    = list(history[:,4])
+# df_results_history['D']     = list(history[:,5])
+# df_results_history['R']     = list(history[:,6])
 
 df_results_mean = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_mean['tvec']  = list(tvec[:soln.shape[1]])
+df_results_mean['tvec']  = list(tvec)
 df_results_mean['S']     = list(soln_avg[:,0])
 df_results_mean['E']     = list(soln_avg[:,1])
 df_results_mean['I1']    = list(soln_avg[:,2])
@@ -414,7 +414,7 @@ df_results_mean['D']     = list(soln_avg[:,5])
 df_results_mean['R']     = list(soln_avg[:,6])
 
 df_results_loCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_loCI['tvec']  = list(tvec[:soln.shape[1]])
+df_results_loCI['tvec']  = list(tvec)
 df_results_loCI['S']     = list(soln_loCI[:,0])
 df_results_loCI['E']     = list(soln_loCI[:,1])
 df_results_loCI['I1']    = list(soln_loCI[:,2])
@@ -424,7 +424,7 @@ df_results_loCI['D']     = list(soln_loCI[:,5])
 df_results_loCI['R']     = list(soln_loCI[:,6])
 
 df_results_upCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_upCI['tvec']  = list(tvec[:soln.shape[1]])
+df_results_upCI['tvec']  = list(tvec)
 df_results_upCI['S']     = list(soln_upCI[:,0])
 df_results_upCI['E']     = list(soln_upCI[:,1])
 df_results_upCI['I1']    = list(soln_upCI[:,2])
