@@ -2,7 +2,7 @@ from jax.dtypes import dtype
 import jax.numpy as np
 import numpy as np2
 from jax import random
-from networks import create_networks
+
 
 def morning_set(Graphs_matrix, hh_occupation=0.9):
 
@@ -110,6 +110,7 @@ def day_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
 
     return w
 
+
 def night_set(Graphs_matrix,hh_occupation=0.7):
 
     # load networks
@@ -194,6 +195,170 @@ def create_day_dynamics(Graphs_matrix,Tmax,total_steps,partitions=[8,8,8]):
         sim_ws.extend(w_intervals)
 
     return sim_intervals, sim_ws
+
+
+def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9):
+
+    # load networks
+    matrix_household = Graphs_matrix[0]
+    hh_row = np.asarray(np2.asarray(matrix_household[0]))
+    hh_col = np.asarray(np2.asarray(matrix_household[1]))
+    hh_data = np.asarray(np2.asarray(matrix_household[2]))
+
+    matrix_school = Graphs_matrix[1]
+    schl_row = np.asarray(np2.asarray(matrix_school[0]))
+    schl_col = np.asarray(np2.asarray(matrix_school[1]))
+    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+
+    matrix_work = Graphs_matrix[2]
+    work_row = np.asarray(np2.asarray(matrix_work[0]))
+    work_col = np.asarray(np2.asarray(matrix_work[1]))
+    work_data = np.asarray(np2.asarray(matrix_work[2]))
+
+    matrix_community = Graphs_matrix[3]
+    comm_row = np.asarray(np2.asarray(matrix_community[0]))
+    comm_col = np.asarray(np2.asarray(matrix_community[1]))
+    comm_data = np.asarray(np2.asarray(matrix_community[2]))
+
+    # turn off school and work layers
+    schl_data_set = 0*schl_data
+    work_data_set = 0*work_data
+
+    # turn on portions of households and community
+    hh_occupation_intervention = hh_occupation*(1-intervention_eff)
+    comm_occupation = 1-hh_occupation
+    comm_occupation_intervention = comm_occupation*(1-intervention_eff)
+
+    length = int(hh_data.shape[0]/2)
+    hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation_intervention),
+                                              shape=(length,)), 2) 
+    hh_data_set = hh_data_select*hh_data
+
+    length = int(comm_data.shape[0]/2)
+    comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation_intervention),
+                                              shape=(length,)), 2) 
+    comm_data_set = comm_data_select*comm_data
+
+    # create conections
+    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    ps = np.concatenate(args_ps)
+    args_rows = (hh_row,schl_row,work_row,comm_row)
+    rows = np.concatenate(args_rows)
+    args_cols = (hh_col,schl_col,work_col,comm_col)
+
+    # load graphs data
+    hh_row,     hh_col,   hh_data = Graphs_matrix[0]
+    schl_row, schl_col, schl_data = Graphs_matrix[1]
+    work_row, work_col, work_data = Graphs_matrix[2]
+    comm_row, comm_col, comm_data = Graphs_matrix[3]
+
+    cols = np.concatenate(args_cols)
+
+    w = [rows.astype(np.int32),cols.astype(np.int32),ps]
+
+    return w
+
+
+def day_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.3, comm_occupation=0.2):
+
+    # load networks
+    matrix_household = Graphs_matrix[0]
+    hh_row = np.asarray(np2.asarray(matrix_household[0]))
+    hh_col = np.asarray(np2.asarray(matrix_household[1]))
+    hh_data = np.asarray(np2.asarray(matrix_household[2]))
+
+    matrix_school = Graphs_matrix[1]
+    schl_row = np.asarray(np2.asarray(matrix_school[0]))
+    schl_col = np.asarray(np2.asarray(matrix_school[1]))
+    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+
+    matrix_work = Graphs_matrix[2]
+    work_row = np.asarray(np2.asarray(matrix_work[0]))
+    work_col = np.asarray(np2.asarray(matrix_work[1]))
+    work_data = np.asarray(np2.asarray(matrix_work[2]))
+
+    matrix_community = Graphs_matrix[3]
+    comm_row = np.asarray(np2.asarray(matrix_community[0]))
+    comm_col = np.asarray(np2.asarray(matrix_community[1]))
+    comm_data = np.asarray(np2.asarray(matrix_community[2]))
+
+     # turn off school and work layers
+    schl_data_set = 0*schl_data
+    work_data_set = 0*work_data
+
+    length = int(hh_data.shape[0]/2)
+    hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation),
+                                              shape=(length,)), 2) 
+    hh_data_set = hh_data_select*hh_data
+    
+    length = int(comm_data.shape[0]/2)
+    comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation),
+                                              shape=(length,)), 2) 
+    comm_data_set = comm_data_select*comm_data
+
+    # create conections
+    args_ps = (hh_data_set,work_data_set,work_data_set,comm_data_set)
+    ps = np.concatenate(args_ps)
+    args_rows = (hh_row,schl_row,work_row,comm_row)
+    rows = np.concatenate(args_rows)
+    args_cols = (hh_col,schl_col,work_col,comm_col)
+    cols = np.concatenate(args_cols)
+
+    w = [rows.astype(np.int32),cols.astype(np.int32),ps]
+
+    return w
+
+def night_set_intervention(Graphs_matrix,hh_occupation=0.7):
+
+    # load networks
+    matrix_household = Graphs_matrix[0]
+    hh_row = np.asarray(np2.asarray(matrix_household[0]))
+    hh_col = np.asarray(np2.asarray(matrix_household[1]))
+    hh_data = np.asarray(np2.asarray(matrix_household[2]))
+
+    matrix_school = Graphs_matrix[1]
+    schl_row = np.asarray(np2.asarray(matrix_school[0]))
+    schl_col = np.asarray(np2.asarray(matrix_school[1]))
+    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+
+    matrix_work = Graphs_matrix[2]
+    work_row = np.asarray(np2.asarray(matrix_work[0]))
+    work_col = np.asarray(np2.asarray(matrix_work[1]))
+    work_data = np.asarray(np2.asarray(matrix_work[2]))
+
+    matrix_community = Graphs_matrix[3]
+    comm_row = np.asarray(np2.asarray(matrix_community[0]))
+    comm_col = np.asarray(np2.asarray(matrix_community[1]))
+    comm_data = np.asarray(np2.asarray(matrix_community[2]))
+
+    # turn off school and work layers
+    schl_data_set = 0*schl_data
+    work_data_set = 0*work_data
+
+    # turn on portions of households and community
+    comm_occupation = 1 - hh_occupation
+
+    length = int(hh_data.shape[0]/2)
+    hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation),
+                                              shape=(length,)), 2) 
+    hh_data_set = hh_data_select*hh_data
+
+    length = int(comm_data.shape[0]/2)
+    comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation),
+                                              shape=(length,)), 2) 
+    comm_data_set = comm_data_select*comm_data
+
+    # create conections
+    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    ps = np.concatenate(args_ps)
+    args_rows = (hh_row,schl_row,work_row,comm_row)
+    rows = np.concatenate(args_rows)
+    args_cols = (hh_col,schl_col,work_col,comm_col)
+    cols = np.concatenate(args_cols)
+
+    w = [rows.astype(np.int32),cols.astype(np.int32),ps]
+
+    return w
 
 
 def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,interv_glob,interv_schools,partitions=[8,8,8]):
