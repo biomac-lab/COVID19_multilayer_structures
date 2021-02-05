@@ -1,4 +1,5 @@
 figures_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/figures
 results_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/results
+multilayers_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/multilayers
 bogota_age_data_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/data/BogotaAgeStructure.txt
 bogota_houses_data_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/data/HousesCensusBOG.CSV
