@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
+multilayers_path = config_data.loc['multilayers_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
 houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
 
@@ -19,6 +20,10 @@ import argparse
 parser = argparse.ArgumentParser(description='Networks visualization.')
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
+parser.add_argument('--save', default=True, type=bool,
+                    help='Speficy if you want to save the networks')
+parser.add_argument('--plot', default=False, type=bool,
+                    help='Speficy if you want to save the figure')
 
 parser.add_argument('--schools_mean', default=9.4, type=float,
                     help='Schools degree distribution (mean)')
@@ -302,6 +307,7 @@ household_G = nx.Graph()
 household_G.add_edges_from(house_edge_list)
 household_G = nx.DiGraph.to_undirected(household_G)
 
+
 school_G = nx.Graph()
 school_G.add_edges_from(school_edge_list)
 school_G = nx.DiGraph.to_undirected(school_G)
@@ -317,268 +323,27 @@ community_G = nx.DiGraph.to_undirected(community_G)
 multilayer4_G = [household_G,school_G,work_G,community_G]
 multilayer4_l = ['household_G','school_G','work_G','community_G']
 
-# Plot and save
-print('Creating figures')
-for i in tqdm(range(0,len(multilayer4_G))):
-    plt.figure(figsize=(20,20))
-    pos = nx.kamada_kawai_layout(multilayer4_G[i])
-    nx.draw(G=multilayer4_G[i], pos=pos, 
-        node_size=6,
-        node_color= 'black',
-        edge_color='gray',
-        width=.15,
-        edge_cmap=plt.cm.Blues, with_labels=False)
-    plt.savefig(os.path.join(figures_path, str(pop)+'_{}.png'.format(multilayer4_l[i])), dpi=400, transparent=False, bbox_inches = 'tight', pad_inches = 0.1)
+if args.save:
+    if not os.path.isdir( os.path.join(args.multilayers_path, str(number_nodes)) ):
+        os.makedirs( os.path.join(args.multilayers_path, str(number_nodes)) )
+    path_save = os.path.join(args.multilayers_path, str(number_nodes))
+    # Save pickle
+    print('Saving networks')
+    for i in tqdm(range(0,len(multilayer4_G))):
+        nx.write_gpickle(multilayer4_G[i], os.path.join(path_save,'{}_{}.pickle'.format(multilayer4_l[i],str(number_nodes))))
+
+if args.plot:
+    # Plot and save
+    print('Creating figures')
+    for i in tqdm(range(0,len(multilayer4_G))):
+        plt.figure(figsize=(20,20))
+        pos = nx.kamada_kawai_layout(multilayer4_G[i])
+        nx.draw(G=multilayer4_G[i], pos=pos, 
+            node_size=6,
+            node_color= 'black',
+            edge_color='gray',
+            width=.15,
+            edge_cmap=plt.cm.Blues, with_labels=False)
+        plt.savefig(os.path.join(figures_path, str(pop)+'_{}.png'.format(multilayer4_l[i])), dpi=400, transparent=False, bbox_inches = 'tight', pad_inches = 0.1)
 
 print('Done!')
-
-#################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-
-
-# if args.layers == 3:    # Households -- Work -- Community
-
-#     ###############################
-#     ##### Degree distribution #####
-
-#     # Frac of population that is school going, working, preschool or elderly
-#     dist_of_pop = [work,very_young+school+university+elderly]
-
-#     # Classifying each person
-#     classify_pop = np2.random.choice(['work','other'], size=pop, p=dist_of_pop)
-
-#     # Number of individuals in each group
-#     state, counts = np2.unique(classify_pop, return_counts=True)
-#     dict_of_counts = dict(zip(state,counts))
-#     working = dict_of_counts['work']
-#     other = dict_of_counts['other']
-
-#     # Indices of individuals in each group
-#     work_indx = np2.where(classify_pop=='work')[0]
-#     other_indx = np2.where(classify_pop=='other')[0]
-
-#     age_tracker = np2.zeros(pop)
-
-#     ####### Work 
-#     # Degree dist., the mean and std div have been taken from the Potter et al data. The factor of 1/3 is used to correspond to daily values and is chosen to match with the work contact survey data
-#     mean, std = args.work_mean, args.work_std
-#     p = 1-(std**2/mean)
-#     n_binom = mean/p
-#     work_degree = np2.random.binomial(n_binom, p, size = working)
-#     # Assuming that on average the size of a work place is ~ 10 people and the correlation is 
-#     # chosen such that the clustering coeff is high as the network in Potter et al had a pretty high value
-#     work_place_size = args.work_size
-#     n_work = working/work_place_size
-#     r_work = args.work_r
-
-#     # Assign each working individual a 'work place'
-#     job_place = np2.random.choice(np.arange(0,n_work+1,1),size=working)
-
-#     # Split the age group of working population according to the population seen in the data
-#     p = []
-#     for i in range(0,len(work_)):
-#         p.append(work_[i]/sum(work_))
-#     age_group_work = np2.random.choice(np.arange(0,len(work_),1),size=working,p=p,replace=True)
-
-#     for i in range(working):
-#         age_tracker[work_indx[i]] = age_group_work[i]
-
-
-#     ## Households
-
-#     # matrix_household = create_networks.create_fully_connected(household_sizes,np2.arange(0,pop,1),args.R0,args.MILDINF_DURATION,args.delta_t)
-#     matrix_household = networks.create_fully_connected(household_sizes,np2.arange(0,pop,1))
-
-#     # Get row, col, data information from the sparse matrices
-#     # Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
-#     matrix_household_row = np.asarray(np2.asarray(matrix_household[0]))
-#     matrix_household_col = np.asarray(np2.asarray(matrix_household[1]))
-#     matrix_household_data = np.asarray(np2.asarray(matrix_household[2]))
-
-#     ## Work
-
-#     # matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,args.R0,args.MILDINF_DURATION,args.delta_t)
-#     matrix_work = networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place)
-
-#     matrix_work_row = np.asarray(np2.asarray(matrix_work[0]))
-#     matrix_work_col = np.asarray(np2.asarray(matrix_work[1]))
-#     matrix_work_data = np.asarray(np2.asarray(matrix_work[2]))
-
-#     ## Community
-
-#     # matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,community_indx,age_group_community,args.R0,args.MILDINF_DURATION,args.delta_t)
-#     matrix_community = networks.create_external_corr(pop,pop,community_degree,n_community,r_community,community_indx,age_group_community)
- 
-#     matrix_community_row = np.asarray(np2.asarray(matrix_community[0]))
-#     matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
-#     matrix_community_data = np.asarray(np2.asarray(matrix_community[2]))
-
-#     # Mean degree of household and external layers
-#     mean_house = sum(matrix_household_data)/pop
-#     mean_work = sum(matrix_work_data)/working
-#     mean_community = sum(matrix_community_data)/pop
-
-#     print("Mean degree household = %0.2f"%mean_house)
-#     print("Mean degree work = %0.2f"%mean_work)
-#     print("Mean degree community = %0.2f"%mean_community)
-
-#     # Combine the data arrays later depending upon the weights needed for the simulations
-
-#     args_rows = (matrix_household_row, matrix_work_row, matrix_community_row)
-#     args_cols = (matrix_household_col, matrix_work_col, matrix_community_col)
-#     rows = np.concatenate(args_rows)
-#     cols = np.concatenate(args_cols)
-
-#     # Get Edges as tuples
-#     house_edge_list = []
-#     for i in range(matrix_household_row.size):
-#         edge_i = (np2.array(matrix_household_row)[i], np2.array(matrix_household_col)[i])
-#         house_edge_list.append(edge_i)
-
-#     work_edge_list = []
-#     for i in range(matrix_work_row.size):
-#         edge_i = (np2.array(matrix_work_row)[i], np2.array(matrix_work_col)[i])
-#         work_edge_list.append(edge_i)  
-
-#     community_edge_list = []
-#     for i in range(matrix_community_row.size):
-#         edge_i = (np2.array(matrix_community_row)[i], np2.array(matrix_community_col)[i])
-#         community_edge_list.append(edge_i) 
-
-#     # Create graphs
-#     print('Creating graphs')
-#     household_G = nx.Graph()
-#     household_G.add_edges_from(house_edge_list)
-#     household_G = nx.DiGraph.to_undirected(household_G)
-
-#     work_G = nx.Graph()
-#     work_G.add_edges_from(work_edge_list)
-#     work_G = nx.DiGraph.to_undirected(work_G)
-
-#     community_G = nx.Graph()
-#     community_G.add_edges_from(community_edge_list)
-#     community_G = nx.DiGraph.to_undirected(community_G)
-
-#     multilayer3_G = [household_G,work_G,community_G]
-#     multilayer3_l = ['household_G','work_G','community_G']
-
-#     # Plot and save
-#     print('Creating figures')
-#     for i in tqdm(range(0,len(multilayer3_G))):
-#         plt.figure(figsize=(12,12))
-#         pos = nx.kamada_kawai_layout(multilayer3_G[i])
-#         nx.draw(G=multilayer3_G[i], pos=pos, 
-#             node_size=12,
-#             node_color= 'black',
-#             edge_color='gray',
-#             width=.2,
-#             edge_cmap=plt.cm.Blues, with_labels=False)
-#         plt.savefig(os.path.join(figures_path, str(pop)+'_{}.png'.format(multilayer3_l[i])), dpi=400, transparent=False, bbox_inches = 'tight', pad_inches = 0.1)
-    
-#     print('Done!')
-
-
-###################################################################################################################################################
-###################################################################################################################################################
-############################################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-###################################################################################################################################################
-
-
-
-
-# if args.layers == 4:    # Households -- School -- Work -- Community
-
-
-
-
-## Plot graph
-# from matplotlib import cm
-# def plot_G(G, communities, not_comms, plot_title, nodecmap,figures_path=figures_path):
-
-#     n_comms = max(communities.values())
-#     pos     = nx.kamada_kawai_layout(G)
-
-#     plt.figure(figsize=(12,12))
-#     #cmap = cm.get_cmap('hsv')#, n_comms+)
-#     #plt.title(str(plot_title) + ' {} biggest clusters'.format(n_comms), size=15)
-
-#     nx.draw(G, pos,
-#             nodelist    = list(not_comms.keys()),
-#             node_size   = 12,
-#             #cmap        = cmap,
-#             node_color  = 'black',
-#             edge_color  = 'gray',
-#             width       = .2,
-#             with_labels = False
-#             )
-
-#     nx.draw(G, pos,
-#             nodelist    = list(communities.keys()),
-#             node_size   = 12,
-#             #cmap        = cmap,
-#             node_color  = nodecmap,
-#             edge_color  = 'gray',
-#             width       = .2,
-#             with_labels = False
-#             )
-#     # plt.savefig(os.path.join(figures_path,'graph_cluster_dynamics_new_6clus.png'), 
-#     #                           dpi=400, transparent = True, bbox_inches = 'tight', pad_inches = 0.1)
-#     plt.show()
-# # G_1000 = nx.read_gpickle( os.path.join(networks_path, 'scale_free_1000') )
-# # partition_1000, n_cluster_1000, cluster_nodes_other_node_cluster1000, top_clusters_1000, top_cluster_nodes_1000 = get_partition(G_1000, n_biggest=3)
-
-
-
-# from models import clusters
-
-# partition,n_cluster,cluster_nodes,top_clusters,top_cluster_nodes = clusters.get_partition(household_G,6)
-
-# n_top_clusters = list(top_cluster_nodes.keys())
-# nodes = []
-# cluster = []
-# n_nodes = []
-# n_cluster = []
-# for idx, clus in enumerate(n_top_clusters):
-#     for key, value in partition.items():
-#         if clus == value:
-#             nodes.append(key)
-#             cluster.append(value)
-#         else:
-#             n_nodes.append(key)
-#             n_cluster.append(value)
-
-# node_cluster = dict(zip(nodes,cluster))
-# other_node_cluster = dict(zip(n_nodes,n_cluster))
-# colors_plt = [ 'tab:green', 'tab:red', 'tab:blue', 'tab:purple', 'tab:cyan', 'tab:orange' ]
-# node_cmap = []
-# for n, c in node_cluster.items():
-#     if c == n_top_clusters[0]:
-#         node_cmap.append(colors_plt[0])
-#     if c == n_top_clusters[1]:
-#         node_cmap.append(colors_plt[1])
-#     if c == n_top_clusters[2]:
-#         node_cmap.append(colors_plt[2])
-#     if c == n_top_clusters[3]:
-#         node_cmap.append(colors_plt[3])
-#     if c == n_top_clusters[4]:
-#         node_cmap.append(colors_plt[4])
-#     if c == n_top_clusters[5]:
-#         node_cmap.append(colors_plt[5])
-
-# plot_G(household_G, node_cluster, other_node_cluster, 'Clustered graph', node_cmap)

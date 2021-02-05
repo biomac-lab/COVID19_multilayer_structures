@@ -408,11 +408,6 @@ def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,schools_day_
     n_day = int(steps_per_days*(partitions[2]/24))
     days_intervals = [m_day, e_day, n_day]
 
-    # m_w = morning_set(Graphs_matrix)
-    # e_w = day_set(Graphs_matrix)
-    # n_w = night_set(Graphs_matrix)
-    # w_intervals = [m_w,e_w,n_w]
-
     m_w_interv = morning_set_intervention(Graphs_matrix,interv_glob)
     e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation)
     e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation,work_occupation)
