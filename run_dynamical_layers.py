@@ -345,10 +345,10 @@ print('Creating dynamics...')
 time_intervals, ws = nd.create_day_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps)
 
 # Bogota data
-BOG_E = int(582085*(pop/total_pop_BOG))
+BOG_E = int(622916*(pop/total_pop_BOG))
 BOG_R = int(pop*0.3)    # Assuming that 30% of population is already recovered
 # BOG_R = int(520853*(pop/total_pop_BOG))
-BOG_D = int(11787*(pop/total_pop_BOG))
+BOG_D = int(12841*(pop/total_pop_BOG))
 
 
 ####################### RUN
