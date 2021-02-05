@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser(description='Networks visualization.')
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
 
-parser.add_argument('--Tmax', default=150, type=int,
+parser.add_argument('--Tmax', default=180, type=int,
                     help='Length of simulation (days)')
 parser.add_argument('--delta_t', default=0.08, type=float,
                     help='Time steps')
@@ -393,15 +393,56 @@ print('Saving results...')
 # Save results
 tvec = np.linspace(0,Tmax,total_steps)
 
-# df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-# df_results_history['tvec']  = list(tvec[:soln.shape[1]])
-# df_results_history['S']     = list(history[:,0])
-# df_results_history['E']     = list(history[:,1])
-# df_results_history['I1']    = list(history[:,2])
-# df_results_history['I2']    = list(history[:,3])
-# df_results_history['I3']    = list(history[:,4])
-# df_results_history['D']     = list(history[:,5])
-# df_results_history['R']     = list(history[:,6])
+df_soln_list = []
+for i in range(args.number_trials):
+  df_results_soln_i = pd.DataFrame(columns=['iter','tvec','S','E','I1','I2','I3','D','R'])
+  df_results_soln_i['iter']  = [i] * len(tvec)
+  df_results_soln_i['tvec']  = list(tvec)
+  df_results_soln_i['S']     = list(soln[i,:,0])
+  df_results_soln_i['E']     = list(soln[i,:,1])
+  df_results_soln_i['I1']    = list(soln[i,:,2])
+  df_results_soln_i['I2']    = list(soln[i,:,3])
+  df_results_soln_i['I3']    = list(soln[i,:,4])
+  df_results_soln_i['D']     = list(soln[i,:,5])
+  df_results_soln_i['R']     = list(soln[i,:,6])
+  df_soln_list.append(df_results_soln_i)
+df_results_soln = pd.concat(df_soln_list)
+
+df_soln_cum_list = []
+for i in range(args.number_trials):
+  df_results_soln_cum_i = pd.DataFrame(columns=['iter','tvec','S','E','I1','I2','I3','D','R'])
+  df_results_soln_cum_i['iter']  = [i] * len(tvec)
+  df_results_soln_cum_i['tvec']  = list(tvec)
+  df_results_soln_cum_i['S']     = list(soln_cum[i,:,0])
+  df_results_soln_cum_i['E']     = list(soln_cum[i,:,1])
+  df_results_soln_cum_i['I1']    = list(soln_cum[i,:,2])
+  df_results_soln_cum_i['I2']    = list(soln_cum[i,:,3])
+  df_results_soln_cum_i['I3']    = list(soln_cum[i,:,4])
+  df_results_soln_cum_i['D']     = list(soln_cum[i,:,5])
+  df_results_soln_cum_i['R']     = list(soln_cum[i,:,6])
+  df_soln_cum_list.append(df_results_soln_cum_i)
+df_results_soln_cum = pd.concat(df_soln_cum_list)
+
+
+df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+df_results_history['tvec']  = list(tvec)
+df_results_history['S']     = list(history[:,0])
+df_results_history['E']     = list(history[:,1])
+df_results_history['I1']    = list(history[:,2])
+df_results_history['I2']    = list(history[:,3])
+df_results_history['I3']    = list(history[:,4])
+df_results_history['D']     = list(history[:,5])
+df_results_history['R']     = list(history[:,6])
+
+df_results_com_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+df_results_com_history['tvec']  = list(tvec)
+df_results_com_history['S']     = list(cumulative_history[:,0])
+df_results_com_history['E']     = list(cumulative_history[:,1])
+df_results_com_history['I1']    = list(cumulative_history[:,2])
+df_results_com_history['I2']    = list(cumulative_history[:,3])
+df_results_com_history['I3']    = list(cumulative_history[:,4])
+df_results_com_history['D']     = list(cumulative_history[:,5])
+df_results_com_history['R']     = list(cumulative_history[:,6])
 
 df_results_mean = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
 df_results_mean['tvec']  = list(tvec)
@@ -434,21 +475,30 @@ df_results_upCI['D']     = list(soln_upCI[:,5])
 df_results_upCI['R']     = list(soln_upCI[:,6])
 
 
-if not os.path.isdir( os.path.join(results_path, str(number_nodes)) ):
-        os.makedirs(os.path.join(results_path, str(number_nodes)))
+if not os.path.isdir( os.path.join(results_path, 'no_intervention', str(number_nodes)) ):
+        os.makedirs(os.path.join(results_path, 'no_intervention', str(number_nodes)))
 
-path_save = os.path.join(results_path, str(number_nodes))
+path_save = os.path.join(results_path, 'no_intervention', str(number_nodes))
 
-df_results_mean.to_csv(path_save+'/{}_history.csv'.format(str(number_nodes)), index=False)
+df_results_soln.to_csv(path_save+'/{}_soln.csv'.format(str(number_nodes)), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_soln_cum.csv'.format(str(number_nodes)), index=False)
+df_results_history.to_csv(path_save+'/{}_history.csv'.format(str(number_nodes)), index=False)
+df_results_com_history.to_csv(path_save+'/{}_com_history.csv'.format(str(number_nodes)), index=False)
 df_results_mean.to_csv(path_save+'/{}_mean.csv'.format(str(number_nodes)), index=False)
 df_results_loCI.to_csv(path_save+'/{}_loCI.csv'.format(str(number_nodes)), index=False)
 df_results_upCI.to_csv(path_save+'/{}_upCI.csv'.format(str(number_nodes)), index=False)
 
 
 # Save other statistics
-per_day = int(1/delta_t)
-soln_smooth=model.smooth_timecourse(soln,int(per_day/2)) # Smoothening over a day
-model.get_peaks_iter(soln_smooth,tvec)
+soln_smooth=model.smooth_timecourse(soln) # Smoothening over a day
+res_peaks = model.get_peaks_iter(soln_smooth,tvec)
+
+import pickle
+with open(path_save+'/{}_peaks.pickle'.format(number_nodes), 'wb') as f:
+  pickle.dump(res_peaks,f)
+
+# with open(path_save+'/{}_peaks.pickle'.format(number_nodes), 'rb') as f:
+#   test = pickle.load(f)
 
 
 print('Done!')
