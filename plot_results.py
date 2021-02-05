@@ -15,8 +15,12 @@ parser = argparse.ArgumentParser(description='Networks visualization.')
 
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
+parser.add_argument('--type', default='no_intervention', type=str,
+                    help='Speficy the type of simulation to plot')
 
 args = parser.parse_args()
+
+results_path = os.path.join(results_path, args.type)
 
 number_nodes = args.population
 pop = number_nodes
