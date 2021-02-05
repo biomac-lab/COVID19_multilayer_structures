@@ -417,15 +417,15 @@ def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
 
   all_cases=soln[:,:,1]+soln[:,:,2]+soln[:,:,3]+soln[:,:,4]
 
-  # final_recovered = {'avrg':100 * np.average(soln[:,-1,6]),
-  #                    'int1':100*np.percentile(soln[:,-1,6],loCI),
-  #                    'int2':100*np.percentile(soln[:,-1,6],upCI)}
-  # final_deaths    = {'avrg':100 * np.average(soln[:,-1,5]),
-  #                     'int1':100*np.percentile(soln[:,-1,5],loCI),
-  #                     'int2':100*np.percentile(soln[:,-1,5],upCI)}
-  # remain_infec    = {'avrg':100 * np.average(all_cases[:,-1]),
-  #                     'int1':100*np.percentile(all_cases[:,-1],loCI),
-  #                     'int2':100*np.percentile(all_cases[:,-1],upCI)}
+  final_recovered = {'perc':100 * np.average(soln[:,-1,6]),
+                     'int1':100*np.percentile(soln[:,-1,6],loCI),
+                     'int2':100*np.percentile(soln[:,-1,6],upCI)}
+  final_deaths    = {'perc':100 * np.average(soln[:,-1,5]),
+                      'int1':100*np.percentile(soln[:,-1,5],loCI),
+                      'int2':100*np.percentile(soln[:,-1,5],upCI)}
+  remain_infec    = {'perc':100 * np.average(all_cases[:,-1]),
+                      'int1':100*np.percentile(all_cases[:,-1],loCI),
+                      'int2':100*np.percentile(all_cases[:,-1],upCI)}
 
   # Final values
   print('Final recovered: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
@@ -437,16 +437,17 @@ def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
 
   # Peak prevalence
   peaks=np.amax(soln[:,:,2],axis=1)
-
-  # preaks_I1        = {'avrg':100 * np.average(peaks),
-  #                    'int1':100 * np.percentile(peaks,loCI),
-  #                    'int2':100 * np.percentile(peaks,upCI)}
-  # preaks_I1        = {'avrg':100 * np.average(peaks),
-  #                     'int1':100 * np.percentile(peaks,loCI),
-  #                     'int2':100 * np.percentile(peaks,upCI)}
-  # preaks_I1        = {'avrg':100 * np.average(peaks),
-  #                     'int1':100 * np.percentile(peaks,loCI),
-  #                     'int2':100 * np.percentile(peaks,upCI)}
+  peaks_I1        = {'perc':100 * np.average(peaks),
+                     'int1':100 * np.percentile(peaks,loCI),
+                     'int2':100 * np.percentile(peaks,upCI)}
+  peaks=np.amax(soln[:,:,3],axis=1)
+  peaks_I2        = {'perc':100 * np.average(peaks),
+                      'int1':100 * np.percentile(peaks,loCI),
+                      'int2':100 * np.percentile(peaks,upCI)}
+  peaks=np.amax(soln[:,:,4],axis=1)
+  peaks_I3        = {'perc':100 * np.average(peaks),
+                      'int1':100 * np.percentile(peaks,loCI),
+                      'int2':100 * np.percentile(peaks,upCI)}
 
 
   print('Peak I1: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
@@ -457,9 +458,25 @@ def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
   peaks=np.amax(soln[:,:,4],axis=1)
   print('Peak I3: {:4.2f}% [{:4.2f}, {:4.2f}]'.format(
       100 * np.average(peaks),100 * np.percentile(peaks,loCI),100 * np.percentile(peaks,upCI)))
-  
+
+      
   # Timing of peaks
   tpeak=np.argmax(soln[:,:,2],axis=1)*delta_t-time_int
+  time_peaks_I1        = {'avg':np.average(tpeak),
+                           'median':np.median(tpeak),
+                           'int1':np.percentile(tpeak,loCI),
+                           'int2':np.percentile(tpeak,upCI)}
+  tpeak=np.argmax(soln[:,:,3],axis=1)*delta_t-time_int
+  time_peaks_I2        = {'avg':np.average(tpeak),
+                           'median':np.median(tpeak),
+                           'int1':np.percentile(tpeak,loCI),
+                           'int2':np.percentile(tpeak,upCI)}
+  tpeak=np.argmax(soln[:,:,4],axis=1)*delta_t-time_int
+  time_peaks_I3        = {'avg':np.average(tpeak),
+                           'median':np.median(tpeak),
+                           'int1':np.percentile(tpeak,loCI),
+                           'int2':np.percentile(tpeak,upCI)}
+
   print('Time of peak I1: avg {:4.2f} days, median {:4.2f} days [{:4.2f}, {:4.2f}]'.format(
       np.average(tpeak),np.median(tpeak), np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
   tpeak=np.argmax(soln[:,:,3],axis=1)*delta_t-time_int
@@ -470,12 +487,22 @@ def get_peaks_iter(soln,tvec,int=0,Tint=0,loCI=5,upCI=95):
       np.average(tpeak),np.median(tpeak),np.percentile(tpeak,loCI),np.percentile(tpeak,upCI)))
   
   # Time when all the infections go extinct
-  time_all_extinct = np.array(get_extinction_time(all_cases,0))*delta_t-time_int
+  time_all_extinct_arr = np.array(get_extinction_time(all_cases,0))*delta_t-time_int
+  time_all_extinct = {'days':np.average(time_all_extinct_arr),
+                      'int1':np.percentile(time_all_extinct_arr,loCI),
+                      'int2':np.percentile(time_all_extinct_arr,upCI)}
 
   print('Time of extinction of all infections post intervention: {:4.2f} days  [{:4.2f}, {:4.2f}]'.format(
-      np.average(time_all_extinct),np.percentile(time_all_extinct,loCI),np.percentile(time_all_extinct,upCI)))
+      np.average(time_all_extinct_arr),np.percentile(time_all_extinct_arr,loCI),np.percentile(time_all_extinct_arr,upCI)))
   
-  return
+  label = ['final_recovered','final_deaths','remain_infec','peaks_I1','peaks_I2','peaks_I3',
+          'time_peaks_I1','time_peaks_I2','time_peaks_I3','time_all_extinct']
+
+  return [final_recovered,final_deaths,remain_infec,
+          peaks_I1,peaks_I2,peaks_I3,
+          time_peaks_I1,time_peaks_I2,time_peaks_I3,
+          time_all_extinct,
+          label]
 
 
 def get_peaks_single_daily(daily_incidence,int=0,Tint=0):
@@ -868,7 +895,7 @@ def get_extinction_time(sol, t):
   return extinction_time
 
 
-def smooth_timecourse(soln,o):
+def smooth_timecourse(soln):
   """
   replaces each entry with the moving average over time
   soln: solution vector, 3D array, to smooth. Assumes time is second dimension
