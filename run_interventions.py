@@ -25,10 +25,20 @@ houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
 from networks import create_networks
 
 import argparse
-parser = argparse.ArgumentParser(description='Networks visualization.')
+parser = argparse.ArgumentParser(description='Simulating interventions')
 
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
+parser.add_argument('--intervention', default=0.6, type=float,
+                    help='Intervention efficiancy')
+parser.add_argument('--work_occupation', default=0.6, type=float,
+                    help='Percentage of occupation at workplaces over intervention')
+parser.add_argument('--school_occupation', default=0.35, type=float,
+                    help='Percentage of occupation at classrooms over intervention')
+parser.add_argument('--school_openings', default=20, type=int,
+                    help='Day of the simulation where schools are open')
+parser.add_argument('--school_alternancy', default=False, type=bool,
+                    help='Percentage of occupation at classrooms over intervention')
 
 parser.add_argument('--Tmax', default=180, type=int,
                     help='Length of simulation (days)')
@@ -341,8 +351,15 @@ total_steps = sum(step_intervals)
 import networks.network_dynamics as nd
 
 print('Creating dynamics...')
+if args.school_alternancy:
 
-time_intervals, ws = nd.create_day_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps)
+    time_intervals, ws = np.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+
+else:
+
+    time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
 
 # Bogota data
 BOG_E = int(582085*(pop/total_pop_BOG))
