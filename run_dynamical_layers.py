@@ -55,9 +55,9 @@ parser.add_argument('--work_size', default=10, type=float,
 parser.add_argument('--work_r', default=1, type=float,
                     help='Correlation in work layer')
 
-parser.add_argument('--community_mean', default=4.3/2, type=float,
+parser.add_argument('--community_mean', default=4.3/2.5, type=float,
                     help='Community degree distribution (mean)')
-parser.add_argument('--community_std', default=1.9/2, type=float,
+parser.add_argument('--community_std', default=1.9/2.5, type=float,
                     help='Community degree distribution (standard deviation)')
 parser.add_argument('--community_n', default=1, type=float,
                     help='Number of community')
@@ -473,6 +473,7 @@ df_results_upCI['I2']    = list(soln_upCI[:,3])
 df_results_upCI['I3']    = list(soln_upCI[:,4])
 df_results_upCI['D']     = list(soln_upCI[:,5])
 df_results_upCI['R']     = list(soln_upCI[:,6])
+
 
 
 if not os.path.isdir( os.path.join(results_path, 'no_intervention', str(number_nodes)) ):
