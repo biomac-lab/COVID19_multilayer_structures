@@ -15,24 +15,44 @@ parser = argparse.ArgumentParser(description='Networks visualization.')
 
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
-parser.add_argument('--type', default='no_intervention', type=str,
+parser.add_argument('--type_sim', default='no_intervention', type=str,
                     help='Speficy the type of simulation to plot')
+parser.add_argument('--intervention', default=0.6, type=float,
+                    help='Intervention efficiancy')
+parser.add_argument('--school_occupation', default=0.35, type=float,
+                    help='Percentage of occupation at classrooms over intervention')
 
 args = parser.parse_args()
-
-results_path = os.path.join(results_path, args.type)
 
 number_nodes = args.population
 pop = number_nodes
 
-def load_results(type,path=results_path,n=pop):
-    read_path = os.path.join(path,str(n),'{}_{}.csv'.format(str(n),str(type)))
+results_path = os.path.join(results_path,args.type_sim,str(pop))
+
+
+
+def load_results_dyn(type_res,path=results_path,n=pop):
+    read_path = os.path.join(path,'{}_{}.csv'.format(str(n),str(type_res)))
     read_file = pd.read_csv(read_path)
     return read_file
 
-mean_res = load_results(type='mean')
-loCI     = load_results(type='loCI')
-upCI     = load_results(type='upCI')
+def load_results_int(type_res,path=results_path,n=pop):
+    read_path = os.path.join(path,'{}_inter_{}_schoolcap_{}_{}.csv'.format(str(n),str(args.intervention),
+                                                                           str(args.school_occupation),type_res))
+    read_file = pd.read_csv(read_path)
+    return read_file
+
+if args.type_sim == 'no_intervention':
+
+    mean_res = load_results_dyn(type_res='mean')
+    loCI     = load_results_dyn(type_res='loCI')
+    upCI     = load_results_dyn(type_res='upCI')
+
+else:
+
+    mean_res = load_results_int(type_res='mean')
+    loCI     = load_results_int(type_res='loCI')
+    upCI     = load_results_int(type_res='upCI')
 
 
 def plot_state_dynamics(soln_avg=mean_res,soln_loCI=loCI,soln_upCI=upCI,scale=1,ymax=1,n=args.population,saveFig=False):

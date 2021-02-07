@@ -324,15 +324,17 @@ multilayer4_G = [household_G,school_G,work_G,community_G]
 multilayer4_l = ['household_G','school_G','work_G','community_G']
 
 if args.save:
-    if not os.path.isdir( os.path.join(args.multilayers_path, str(number_nodes)) ):
-        os.makedirs( os.path.join(args.multilayers_path, str(number_nodes)) )
-    path_save = os.path.join(args.multilayers_path, str(number_nodes))
+    if not os.path.isdir( os.path.join(multilayers_path, str(number_nodes)) ):
+        os.makedirs( os.path.join(multilayers_path, str(number_nodes)) )
+    path_save = os.path.join(multilayers_path, str(number_nodes))
     # Save pickle
     print('Saving networks')
     for i in tqdm(range(0,len(multilayer4_G))):
         nx.write_gpickle(multilayer4_G[i], os.path.join(path_save,'{}_{}.pickle'.format(multilayer4_l[i],str(number_nodes))))
 
 if args.plot:
+    if not os.path.isdir( os.path.join(figures_path, str(number_nodes)) ):
+        os.makedirs( os.path.join(figures_path, str(number_nodes)) )
     # Plot and save
     print('Creating figures')
     for i in tqdm(range(0,len(multilayer4_G))):

@@ -353,7 +353,7 @@ import networks.network_dynamics as nd
 print('Creating dynamics...')
 if args.school_alternancy:
 
-    time_intervals, ws = np.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+    time_intervals, ws = nd.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
                                                             interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
 
 else:
@@ -492,18 +492,22 @@ df_results_upCI['D']     = list(soln_upCI[:,5])
 df_results_upCI['R']     = list(soln_upCI[:,6])
 
 
-if not os.path.isdir( os.path.join(results_path, 'no_intervention', str(number_nodes)) ):
-        os.makedirs(os.path.join(results_path, 'no_intervention', str(number_nodes)))
+intervention_save = 'intervention'
+if args.school_alternancy == True:
+  intervention_save = 'school_alternancy'
+  
+if not os.path.isdir( os.path.join(results_path, intervention_save, str(number_nodes)) ):
+        os.makedirs(os.path.join(results_path, intervention_save, str(number_nodes)))
 
-path_save = os.path.join(results_path, 'no_intervention', str(number_nodes))
+path_save = os.path.join(results_path, intervention_save, str(number_nodes))
 
-df_results_soln.to_csv(path_save+'/{}_soln.csv'.format(str(number_nodes)), index=False)
-df_results_soln_cum.to_csv(path_save+'/{}_soln_cum.csv'.format(str(number_nodes)), index=False)
-df_results_history.to_csv(path_save+'/{}_history.csv'.format(str(number_nodes)), index=False)
-df_results_com_history.to_csv(path_save+'/{}_com_history.csv'.format(str(number_nodes)), index=False)
-df_results_mean.to_csv(path_save+'/{}_mean.csv'.format(str(number_nodes)), index=False)
-df_results_loCI.to_csv(path_save+'/{}_loCI.csv'.format(str(number_nodes)), index=False)
-df_results_upCI.to_csv(path_save+'/{}_upCI.csv'.format(str(number_nodes)), index=False)
+df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_mean.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mean.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_loCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_loCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_upCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_upCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
 
 
 # Save other statistics
@@ -511,7 +515,7 @@ soln_smooth=model.smooth_timecourse(soln) # Smoothening over a day
 res_peaks = model.get_peaks_iter(soln_smooth,tvec)
 
 import pickle
-with open(path_save+'/{}_peaks.pickle'.format(number_nodes), 'wb') as f:
+with open(path_save+'/{}_inter_{}_schoolcap_{}_peaks.pickle'.format(str(number_nodes),str(args.intervention),str(args.school_occupation), 'wb')) as f:
   pickle.dump(res_peaks,f)
 
 # with open(path_save+'/{}_peaks.pickle'.format(number_nodes), 'rb') as f:
