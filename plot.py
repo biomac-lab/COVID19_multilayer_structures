@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
 parser.add_argument('--population', default=100000, type=int,
                     help='Speficy the number of individials')
-parser.add_argument('--type_sim', default='intervention', type=str,
+parser.add_argument('--type_sim', default='school_alternancy', type=str,
                     help='Speficy the type of simulation to plot')
 parser.add_argument('--intervention', default=0.6, type=float,
                     help='Intervention efficiancy')
