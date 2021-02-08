@@ -11,7 +11,7 @@ houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
 
 import argparse
 
-parser = argparse.ArgumentParser(description='Networks visualization.')
+parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
 parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
