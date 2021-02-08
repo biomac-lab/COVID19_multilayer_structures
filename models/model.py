@@ -14,6 +14,7 @@ from jax.lax import fori_loop
 from jax.nn import relu
 import jax.numpy as np
 import numpy as np2
+import pandas as pd
 from jax.ops import index_add, index_update, index
 import tqdm
 import matplotlib.pyplot as plt
@@ -747,23 +748,45 @@ def get_daily_iter(soln_cum,tvec):
   soln_cum: 2D array of cumulative values for each variable at each timepoint
   tvec: 1D vector of timepoints
   """
-  
+  states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
   Tmax=int(tvec[-1])
-  delta_t=tvec[1]-tvec[0]
-  total_steps=int(Tmax/delta_t)
+  max_indx = len(tvec)
+  #delta_t=tvec[1]-tvec[0]
+  #total_steps=int(Tmax/delta_t)
 
   # get daily incidence
 
-  per_day=int(round(1/delta_t)) # number of entries per day
-  days_ind=np.arange(start=0,stop=total_steps,step=per_day)
+  #per_day=int(round(1/delta_t)) # number of entries per day
+  #days_ind=np.arange(start=0,stop=total_steps,step=per_day)
+  days_ind=np.array(tvec)
 
-  soln_inc=np.zeros((np.shape(soln_cum)[0],Tmax-1,np.shape(soln_cum)[2]))
+  soln_inc=np.zeros((0,Tmax-1,7))
 
-  for i in range(0,7):
-    daily_cumulative_history=soln_cum[:,days_ind,i] # first pick out entries corresponding to each day
-    soln_inc=index_add(soln_inc,index[:,:,i],daily_cumulative_history[:,1:Tmax]-daily_cumulative_history[:,0:(Tmax-1)]) # then get differences between each day
+  df_list = []
+  for i in range(10):
+    soln_cum_i = soln_cum['iter'] == i
+    soln_cum_i = pd.DataFrame(soln_cum[soln_cum_i])
 
-  return soln_inc
+    diff1 = soln_cum_i.iloc[1:max_indx]
+    vals_diff1 = np.array(diff1[states_])
+    diff2 = soln_cum_i.iloc[0:max_indx-1]
+    vals_diff2 = np.array(diff2[states_])
+    diff = vals_diff1 - vals_diff2
+
+    df_soln_inc = pd.DataFrame(columns=['tvec']+states_)
+    df_soln_inc['tvec']  = tvec[:len(tvec)-1]
+    df_soln_inc['S']     = list(diff[:,0])
+    df_soln_inc['E']     = list(diff[:,1])
+    df_soln_inc['I1']    = list(diff[:,2])
+    df_soln_inc['I2']    = list(diff[:,3])
+    df_soln_inc['I3']    = list(diff[:,4])
+    df_soln_inc['D']     = list(diff[:,5])
+    df_soln_inc['R']     = list(diff[:,6])
+    df_list.append(df_soln_inc)
+
+  df_res = pd.concat(df_list)
+
+  return df_res
 
 def plot_iter_daily(soln_inc,n,ymax=1,scale=1,int=0,Tint=1,plotThis=False,plotName="test"):
 
