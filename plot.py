@@ -54,11 +54,11 @@ def load_results_ints(type_res,n,int_effec,schl_occup,path=results_path):
 
 ### Plot new cases
 
-# intervention_effcs = [0.2,0.4,0.6,1.0]
-# interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
-# interv_color_label = ['tab:red','tab:purple','tab:orange','k']
+intervention_effcs = [0.2,0.4,0.6,1.0]
+interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
+interv_color_label = ['tab:red','tab:purple','tab:orange','k']
 
-# states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
+states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 
 # fig, ax = plt.subplots(1,2,figsize=(14, 4))
 # for i, inter_ in tqdm(enumerate(intervention_effcs),total=len(intervention_effcs)):
