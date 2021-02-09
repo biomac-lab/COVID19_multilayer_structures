@@ -362,10 +362,20 @@ else:
                                                             interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
 
 # Bogota data
-BOG_E = int(582085*(pop/total_pop_BOG))
-BOG_R = int(pop*0.3)    # Assuming that 30% of population is already recovered
-# BOG_R = int(520853*(pop/total_pop_BOG))
-BOG_D = int(11787*(pop/total_pop_BOG))
+
+cum_cases = 632532
+cum_rec   = 593329
+mild_house = 17595
+hosp_beds = 5369
+ICU_beds  = 1351
+deaths    = 13125
+
+BOG_E = int( pop * (cum_cases-cum_rec-mild_house-deaths)/total_pop_BOG)
+BOG_R = int( pop * 0.3 )    # Assuming that 30% of population is already recovered
+BOG_I1 = int( pop * mild_house/total_pop_BOG )
+BOG_I2 = int( pop * hosp_beds/total_pop_BOG )
+BOG_I3 = int( pop * ICU_beds/total_pop_BOG )
+BOG_D  = int( pop * deaths/total_pop_BOG )
 
 
 ####################### RUN
@@ -378,9 +388,15 @@ for key in tqdm(range(args.number_trials), total=args.number_trials):
   #Initial condition
   init_ind_E = random.uniform(random.PRNGKey(key), shape=(BOG_E,), maxval=pop).astype(np.int32)
   init_ind_R = random.uniform(random.PRNGKey(key), shape=(BOG_R,), maxval=pop).astype(np.int32)
+  init_ind_I1 = random.uniform(random.PRNGKey(key), shape=(BOG_I1,), maxval=pop).astype(np.int32)
+  init_ind_I2 = random.uniform(random.PRNGKey(key), shape=(BOG_I2,), maxval=pop).astype(np.int32)
+  init_ind_I3 = random.uniform(random.PRNGKey(key), shape=(BOG_I3,), maxval=pop).astype(np.int32)
   init_ind_D = random.uniform(random.PRNGKey(key), shape=(BOG_D,), maxval=pop).astype(np.int32)
   init_state = np.zeros(pop, dtype=np.int32)
   init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*1) # E
+  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*2) # I1
+  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*3) # I2
+  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*4) # I3
   init_state = index_update(init_state,init_ind_D,np.ones(BOG_D, dtype=np.int32)*5) # D
   init_state = index_update(init_state,init_ind_R,np.ones(BOG_R, dtype=np.int32)*6) # R
 
@@ -461,35 +477,35 @@ df_results_com_history['I3']    = list(cumulative_history[:,4])
 df_results_com_history['D']     = list(cumulative_history[:,5])
 df_results_com_history['R']     = list(cumulative_history[:,6])
 
-df_results_mean = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_mean['tvec']  = list(tvec)
-df_results_mean['S']     = list(soln_avg[:,0])
-df_results_mean['E']     = list(soln_avg[:,1])
-df_results_mean['I1']    = list(soln_avg[:,2])
-df_results_mean['I2']    = list(soln_avg[:,3])
-df_results_mean['I3']    = list(soln_avg[:,4])
-df_results_mean['D']     = list(soln_avg[:,5])
-df_results_mean['R']     = list(soln_avg[:,6])
+# df_results_mean = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_mean['tvec']  = list(tvec)
+# df_results_mean['S']     = list(soln_avg[:,0])
+# df_results_mean['E']     = list(soln_avg[:,1])
+# df_results_mean['I1']    = list(soln_avg[:,2])
+# df_results_mean['I2']    = list(soln_avg[:,3])
+# df_results_mean['I3']    = list(soln_avg[:,4])
+# df_results_mean['D']     = list(soln_avg[:,5])
+# df_results_mean['R']     = list(soln_avg[:,6])
 
-df_results_loCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_loCI['tvec']  = list(tvec)
-df_results_loCI['S']     = list(soln_loCI[:,0])
-df_results_loCI['E']     = list(soln_loCI[:,1])
-df_results_loCI['I1']    = list(soln_loCI[:,2])
-df_results_loCI['I2']    = list(soln_loCI[:,3])
-df_results_loCI['I3']    = list(soln_loCI[:,4])
-df_results_loCI['D']     = list(soln_loCI[:,5])
-df_results_loCI['R']     = list(soln_loCI[:,6])
+# df_results_loCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_loCI['tvec']  = list(tvec)
+# df_results_loCI['S']     = list(soln_loCI[:,0])
+# df_results_loCI['E']     = list(soln_loCI[:,1])
+# df_results_loCI['I1']    = list(soln_loCI[:,2])
+# df_results_loCI['I2']    = list(soln_loCI[:,3])
+# df_results_loCI['I3']    = list(soln_loCI[:,4])
+# df_results_loCI['D']     = list(soln_loCI[:,5])
+# df_results_loCI['R']     = list(soln_loCI[:,6])
 
-df_results_upCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
-df_results_upCI['tvec']  = list(tvec)
-df_results_upCI['S']     = list(soln_upCI[:,0])
-df_results_upCI['E']     = list(soln_upCI[:,1])
-df_results_upCI['I1']    = list(soln_upCI[:,2])
-df_results_upCI['I2']    = list(soln_upCI[:,3])
-df_results_upCI['I3']    = list(soln_upCI[:,4])
-df_results_upCI['D']     = list(soln_upCI[:,5])
-df_results_upCI['R']     = list(soln_upCI[:,6])
+# df_results_upCI = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+# df_results_upCI['tvec']  = list(tvec)
+# df_results_upCI['S']     = list(soln_upCI[:,0])
+# df_results_upCI['E']     = list(soln_upCI[:,1])
+# df_results_upCI['I1']    = list(soln_upCI[:,2])
+# df_results_upCI['I2']    = list(soln_upCI[:,3])
+# df_results_upCI['I3']    = list(soln_upCI[:,4])
+# df_results_upCI['D']     = list(soln_upCI[:,5])
+# df_results_upCI['R']     = list(soln_upCI[:,6])
 
 
 intervention_save = 'intervention'
@@ -505,9 +521,9 @@ df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln.csv'.format(str
 df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
 df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
 df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_mean.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mean.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_loCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_loCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_upCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_upCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+# df_results_mean.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mean.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+# df_results_loCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_loCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+# df_results_upCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_upCI.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
 
 
 # Save other statistics
