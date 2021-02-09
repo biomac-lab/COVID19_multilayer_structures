@@ -925,11 +925,30 @@ def smooth_timecourse(soln):
   o: # of days (entries) on either side of the current value to average over. o=3 -> 1 week
   """
   soln_smooth=soln
-  for iter in range(np.shape(soln)[0]):
-    for var in range(np.shape(soln)[2]):
-      z=moving_average(soln[iter,:,var],1)
-      soln_smooth=index_update(soln_smooth,index[iter,:,var],z)
-  return soln_smooth
+  states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
+  df_list = []
+  # for iter in range(np.shape(soln)[0]):
+  for iter in range(max(soln['iter'])+1):
+    #for var in range(np.shape(soln)[2]):
+    soln_i = soln['iter'] == iter
+    soln_i = pd.DataFrame(soln[soln_i])
+    tvec = soln_i['tvec']
+
+    df_res_i = pd.DataFrame(columns=['iter','tvec']+states_)
+    df_res_i['iter']  = [iter] * len(tvec)
+    df_res_i['tvec']  = list(tvec)
+    df_res_i['S']     = list(moving_average(np.array(soln_i['S']),1))
+    df_res_i['E']     = list(moving_average(np.array(soln_i['E']),1))
+    df_res_i['I1']    = list(moving_average(np.array(soln_i['I1']),1))
+    df_res_i['I2']    = list(moving_average(np.array(soln_i['I2']),1))
+    df_res_i['I3']    = list(moving_average(np.array(soln_i['I3']),1))
+    df_res_i['D']     = list(moving_average(np.array(soln_i['D']),1))
+    df_res_i['R']     = list(moving_average(np.array(soln_i['R']),1))
+    df_list.append(df_res_i)
+
+  df_res_smooth = pd.concat(df_list)
+
+  return df_res_smooth
 
 def moving_average(x, o):
   """

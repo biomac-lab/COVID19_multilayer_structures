@@ -305,6 +305,8 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
     # turn off portions of school and work layers
     if schl_occupation == 0:    
         schl_data_set = 0*schl_data     # if schools are fully closed
+    elif schl_occupation == 1.0:
+        schl_data_set = schl_data
     else:
         length = int(schl_data.shape[0]/2)
         schl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
@@ -410,7 +412,7 @@ def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,schools_day_
 
     m_w_interv = morning_set_intervention(Graphs_matrix,interv_glob)
     e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation)
-    e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation,work_occupation)
+    e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=schl_occupation,work_occupation=work_occupation)
     n_w_interv = night_set_intervention(Graphs_matrix,interv_glob)
 
     w_interv_intervals_schl_close = [m_w_interv,e_w_interv_schl_close,n_w_interv]
