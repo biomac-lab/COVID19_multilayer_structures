@@ -511,12 +511,12 @@ df_results_upCI.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_upCI.csv'.format(str
 
 
 # Save other statistics
-soln_smooth=model.smooth_timecourse(soln) # Smoothening over a day
-res_peaks = model.get_peaks_iter(soln_smooth,tvec)
+# soln_smooth=model.smooth_timecourse(soln) # Smoothening over a day
+# res_peaks = model.get_peaks_iter(soln_smooth,tvec)
 
-import pickle
-with open(path_save+'/{}_inter_{}_schoolcap_{}_peaks.pickle'.format(str(number_nodes),str(args.intervention),str(args.school_occupation), 'wb')) as f:
-  pickle.dump(res_peaks,f)
+# import pickle
+# with open(path_save+'/{}_inter_{}_schoolcap_{}_peaks.pickle'.format(str(number_nodes),str(args.intervention),str(args.school_occupation), 'wb')) as f:
+#   pickle.dump(res_peaks,f)
 
 # with open(path_save+'/{}_peaks.pickle'.format(number_nodes), 'rb') as f:
 #   test = pickle.load(f)
