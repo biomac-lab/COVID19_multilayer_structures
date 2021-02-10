@@ -460,7 +460,11 @@ df_results_soln_cum = pd.concat(df_soln_cum_list)
 df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
 df_results_history['tvec']  = list(tvec)
 df_results_history['S']     = list(history[:,0])
-df_results_history['E']     = list(history[:,1])
+df_results_history['E']     = list(histo# interventions and school capacity of 25%
+python run_interventions.py --population 100000 --intervention 0.6 --school_occupation 0.25
+python run_interventions.py --population 100000 --intervention 0.4 --school_occupation 0.25
+python run_interventions.py --population 100000 --intervention 0.2 --school_occupation 0.25
+ry[:,1])
 df_results_history['I1']    = list(history[:,2])
 df_results_history['I2']    = list(history[:,3])
 df_results_history['I3']    = list(history[:,4])
