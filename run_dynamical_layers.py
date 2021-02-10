@@ -370,20 +370,20 @@ for key in tqdm(range(args.number_trials), total=args.number_trials):
 
   #Initial condition
   init_ind_E = random.uniform(random.PRNGKey(key), shape=(BOG_E,), maxval=pop).astype(np.int32)
-  init_ind_R = random.uniform(random.PRNGKey(key), shape=(BOG_R,), maxval=pop).astype(np.int32)
   init_ind_I1 = random.uniform(random.PRNGKey(key), shape=(BOG_I1,), maxval=pop).astype(np.int32)
   init_ind_I2 = random.uniform(random.PRNGKey(key), shape=(BOG_I2,), maxval=pop).astype(np.int32)
   init_ind_I3 = random.uniform(random.PRNGKey(key), shape=(BOG_I3,), maxval=pop).astype(np.int32)
   init_ind_D = random.uniform(random.PRNGKey(key), shape=(BOG_D,), maxval=pop).astype(np.int32)
+  init_ind_R = random.uniform(random.PRNGKey(key), shape=(BOG_R,), maxval=pop).astype(np.int32)
   init_state = np.zeros(pop, dtype=np.int32)
   init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*1) # E
-  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*2) # I1
-  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*3) # I2
-  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*4) # I3
+  init_state = index_update(init_state,init_ind_I1,np.ones(BOG_I1, dtype=np.int32)*2) # I1
+  init_state = index_update(init_state,init_ind_I2,np.ones(BOG_I2, dtype=np.int32)*3) # I2
+  init_state = index_update(init_state,init_ind_I3,np.ones(BOG_I3, dtype=np.int32)*4) # I3
   init_state = index_update(init_state,init_ind_D,np.ones(BOG_D, dtype=np.int32)*5) # D
   init_state = index_update(init_state,init_ind_R,np.ones(BOG_R, dtype=np.int32)*6) # R
 
-
+  
   _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
 
   #Run simulation
