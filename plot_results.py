@@ -64,6 +64,7 @@ def plot_state_dynamics(soln_avg=res_median,soln_loCI=res_loCI,soln_upCI=res_upC
         plt.fill_between(tvec,soln_loCI[str(s)]*scale,soln_upCI[str(s)]*scale,alpha=0.3)
 
     plt.ylim([0,ymax*scale])
+    plt.ylim([0,0.1])
     plt.xlabel("Time (days)")
     plt.ylabel("Number")
 

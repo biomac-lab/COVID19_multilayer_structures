@@ -87,7 +87,7 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
         plt.axvspan(0,20,color='k',alpha=0.035)
         plt.annotate('Schools \n closed',(0,8))
         plt.xlim([0,max(res_median['tvec'])])
-        plt.ylim([0,1*100])
+        plt.ylim([0,0.1*100])
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
