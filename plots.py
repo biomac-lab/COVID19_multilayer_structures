@@ -87,7 +87,7 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
         plt.axvspan(0,20,color='k',alpha=0.035)
         plt.annotate('Schools \n closed',(0,8))
         plt.xlim([0,max(res_median['tvec'])])
-        plt.ylim([0,0.1*100])
+        plt.ylim([0,1*100])
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
@@ -102,8 +102,8 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
 
     save_path = os.path.join(figures_path,'cases_evolution','lin_{}_dynamics_schoolcap_{}_n_{}.png'.format(args.type_sim,cap_,str(pop)))
 
-    plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
-
+    #plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+    plt.show()
 
 # logaritmic
 for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
@@ -146,5 +146,6 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
     save_path = os.path.join(figures_path,'cases_evolution','log_{}_dynamics_schoolcap_{}_n_{}.png'.format(args.type_sim,cap_,str(pop)))
 
     plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+    #plt.show()
 
 

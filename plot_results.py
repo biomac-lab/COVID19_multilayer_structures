@@ -13,7 +13,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
-parser.add_argument('--population', default=1000, type=int,
+parser.add_argument('--population', default=100000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--type_sim', default='no_intervention', type=str,
                     help='Speficy the type of simulation to plot')
@@ -42,22 +42,15 @@ def load_results_int(type_res,path=results_path,n=pop):
     read_file = pd.read_csv(read_path)
     return read_file
 
-if args.type_sim == 'no_intervention':
+alpha = 0.05
+res_read = load_results_dyn('soln')
+res_median = res_read.groupby('tvec').median(); res_median = res_median.reset_index()
+res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
+res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
 
-    mean_res = load_results_dyn(type_res='mean')
-    loCI     = load_results_dyn(type_res='loCI')
-    upCI     = load_results_dyn(type_res='upCI')
+def plot_state_dynamics(soln_avg=res_median,soln_loCI=res_loCI,soln_upCI=res_upCI,scale=1,ymax=1,n=args.population,saveFig=False):
 
-else:
-
-    mean_res = load_results_int(type_res='mean')
-    loCI     = load_results_int(type_res='loCI')
-    upCI     = load_results_int(type_res='upCI')
-
-
-def plot_state_dynamics(soln_avg=mean_res,soln_loCI=loCI,soln_upCI=upCI,scale=1,ymax=1,n=args.population,saveFig=False):
-
-    tvec = mean_res['tvec']
+    tvec = res_median['tvec']
     states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 
     # plot linear
