@@ -392,7 +392,7 @@ plt.show()
 intervention_effcs = [0.2,0.4,0.6,1.0]
 interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
 interv_color_label = ['tab:red','tab:purple','tab:orange','k']
-school_caps        = [0.15,0.25,0.35,0.55,1.0]
+school_caps        = [0.35]#[0.15,0.25,0.35,0.55,1.0]
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 plot_state = 'E'
@@ -473,17 +473,17 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
-        plt.ylabel(r"Comulative cases per 100,000 ind",size=12)
+        plt.ylabel(r"Comulative deaths per 100,000 ind",size=12)
         if args.type_sim == 'intervention':
-            plt.title(r'Comulative cases with schools opening ${}\%$ occupation'.format(int(cap_*100)))
+            plt.title(r'Comulative deaths with schools opening ${}\%$ occupation'.format(int(cap_*100)))
         elif args.type_sim == 'school_alternancy':
-            plt.title(r'Comulative cases with schools alterning ${}\%$ occupation'.format(int(cap_*100)))
+            plt.title(r'Comulative deaths with schools alterning ${}\%$ occupation'.format(int(cap_*100)))
 
     if not os.path.isdir( os.path.join(figures_path,'comulative_cases') ):
         os.makedirs( os.path.join(figures_path,'comulative_cases') )
 
     save_path = os.path.join(figures_path,'comulative_cases','{}_lin_{}_dynamics_schoolcap_{}_n_{}.png'.format(plot_state,args.type_sim,cap_,str(pop)))
 
-    #plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+    plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
 
 plt.show()
