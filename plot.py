@@ -125,82 +125,82 @@ states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 
 ### Plot dayly incidence and comulative number
 
-# intervention_effcs = [0.2,0.4,0.6,1.0]
-# interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
-# interv_color_label = ['tab:red','tab:purple','tab:orange','k']
+intervention_effcs = [0.2,0.4,0.6,1.0]
+interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
+interv_color_label = ['tab:red','tab:purple','tab:orange','k']
 
-# states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
+states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 
-# fig, ax = plt.subplots(1,2,figsize=(14, 4))
-# for i, inter_ in tqdm(enumerate(intervention_effcs),total=len(intervention_effcs)):
-#     # read results
-#     if inter_ < 1.0:
-#         res_read = load_results_ints('soln_cum',args.population,inter_,args.school_occupation)
-#         res_mean = res_read.groupby('tvec').mean(); res_mean = res_mean.reset_index()
-#         res_loCI = res_read.groupby('tvec').quantile(0.05); res_loCI = res_loCI.reset_index()
-#         res_upCI = res_read.groupby('tvec').quantile(0.95); res_upCI = res_upCI.reset_index()
-#         res_tvec = list(res_mean['tvec'])
-#         res_inc  = model.get_daily_iter(res_read,res_tvec)
-#         res_mean_inc = res_inc.groupby('tvec').mean(); res_mean_inc = res_mean_inc.reset_index()
-#         res_loCI_inc = res_inc.groupby('tvec').quantile(0.05); res_loCI_inc = res_loCI_inc.reset_index()
-#         res_upCI_inc = res_inc.groupby('tvec').quantile(0.95); res_upCI_inc = res_upCI_inc.reset_index()
-#     elif inter_ == 1.0:
-#         res_read = load_results_dyn('soln_cum',os.path.join('results','no_intervention',str(pop),))
-#         res_mean = res_read.groupby('tvec').mean(); res_mean = res_mean.reset_index()
-#         res_loCI = res_read.groupby('tvec').quantile(0.05); res_loCI = res_loCI.reset_index()
-#         res_upCI = res_read.groupby('tvec').quantile(0.95); res_upCI = res_upCI.reset_index()
-#         res_tvec = list(res_mean['tvec'])
-#         res_inc  = model.get_daily_iter(res_read,res_tvec)
-#         res_mean_inc = res_inc.groupby('tvec').mean(); res_mean_inc = res_mean_inc.reset_index()
-#         res_loCI_inc = res_inc.groupby('tvec').quantile(0.05); res_loCI_inc = res_loCI_inc.reset_index()
-#         res_upCI_inc = res_inc.groupby('tvec').quantile(0.95); res_upCI_inc = res_upCI_inc.reset_index()
+fig, ax = plt.subplots(1,2,figsize=(14, 4))
+for i, inter_ in tqdm(enumerate(intervention_effcs),total=len(intervention_effcs)):
+    # read results
+    if inter_ < 1.0:
+        res_read = load_results_ints('soln_cum',args.population,inter_,args.school_occupation)
+        res_mean = res_read.groupby('tvec').mean(); res_mean = res_mean.reset_index()
+        res_loCI = res_read.groupby('tvec').quantile(0.05); res_loCI = res_loCI.reset_index()
+        res_upCI = res_read.groupby('tvec').quantile(0.95); res_upCI = res_upCI.reset_index()
+        res_tvec = list(res_mean['tvec'])
+        res_inc  = model.get_daily_iter(res_read,res_tvec)
+        res_mean_inc = res_inc.groupby('tvec').mean(); res_mean_inc = res_mean_inc.reset_index()
+        res_loCI_inc = res_inc.groupby('tvec').quantile(0.05); res_loCI_inc = res_loCI_inc.reset_index()
+        res_upCI_inc = res_inc.groupby('tvec').quantile(0.95); res_upCI_inc = res_upCI_inc.reset_index()
+    elif inter_ == 1.0:
+        res_read = load_results_dyn('soln_cum',os.path.join('results','no_intervention',str(pop),))
+        res_mean = res_read.groupby('tvec').mean(); res_mean = res_mean.reset_index()
+        res_loCI = res_read.groupby('tvec').quantile(0.05); res_loCI = res_loCI.reset_index()
+        res_upCI = res_read.groupby('tvec').quantile(0.95); res_upCI = res_upCI.reset_index()
+        res_tvec = list(res_mean['tvec'])
+        res_inc  = model.get_daily_iter(res_read,res_tvec)
+        res_mean_inc = res_inc.groupby('tvec').mean(); res_mean_inc = res_mean_inc.reset_index()
+        res_loCI_inc = res_inc.groupby('tvec').quantile(0.05); res_loCI_inc = res_loCI_inc.reset_index()
+        res_upCI_inc = res_inc.groupby('tvec').quantile(0.95); res_upCI_inc = res_upCI_inc.reset_index()
 
-#     plt.subplot(121)
-#     plt.plot(res_mean_inc['tvec'],res_mean_inc['E']*pop,color=interv_color_label[i],alpha=0.6)
-#     plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(1,1), loc="best")
-#     plt.gca().set_prop_cycle(None)
-#     plt.fill_between(res_mean_inc['tvec'],res_loCI_inc['E']*pop,res_upCI_inc['E']*pop,color=interv_color_label[i],alpha=0.3)
-#     #plt.plot([20,20],[0,100],'k--',alpha=0.2)
-#     plt.xlim([0,max(res_mean_inc['tvec'])])
-#     plt.ylim([pop/pop,0.01*pop])
-#     plt.xticks(size=12)
-#     plt.yticks(size=12)
-#     plt.xlabel("Time (days)",size=12)
-#     plt.ylabel(r"Daily incidence per 100,000 ind",size=12)
-#     if args.type_sim == 'intervention':
-#         plt.title(r'Daily incidence with schools opening ${:.2f}\%$ occupation'.format(args.school_occupation*100))
-#     elif args.type_sim == 'school_alternancy':
-#         plt.title(r'Daily incidence with schools alterning ${:.2f}\%$ occupation'.format(args.school_occupation*100))
-#     plt.semilogy()
-#     plt.tight_layout()
+    plt.subplot(121)
+    plt.plot(res_mean_inc['tvec'],res_mean_inc['E']*pop,color=interv_color_label[i],alpha=0.6)
+    plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(1,1), loc="best")
+    plt.gca().set_prop_cycle(None)
+    plt.fill_between(res_mean_inc['tvec'],res_loCI_inc['E']*pop,res_upCI_inc['E']*pop,color=interv_color_label[i],alpha=0.3)
+    #plt.plot([20,20],[0,100],'k--',alpha=0.2)
+    plt.xlim([0,max(res_mean_inc['tvec'])])
+    plt.ylim([pop/pop,0.01*pop])
+    plt.xticks(size=12)
+    plt.yticks(size=12)
+    plt.xlabel("Time (days)",size=12)
+    plt.ylabel(r"Daily incidence per 100,000 ind",size=12)
+    if args.type_sim == 'intervention':
+        plt.title(r'Daily incidence with schools opening ${:.2f}\%$ occupation'.format(args.school_occupation*100))
+    elif args.type_sim == 'school_alternancy':
+        plt.title(r'Daily incidence with schools alterning ${:.2f}\%$ occupation'.format(args.school_occupation*100))
+    plt.semilogy()
+    plt.tight_layout()
 
-#     plt.subplot(122)
-#     plt.plot(res_mean['tvec'],res_mean['E']*pop,color=interv_color_label[i],alpha=0.6)
-#     plt.gca().set_prop_cycle(None)
-#     plt.fill_between(res_mean['tvec'],res_loCI['E']*pop,res_upCI['E']*pop,color=interv_color_label[i],alpha=0.3)
-#     plt.xlim([0,max(res_mean['tvec'])])
-#     plt.ylim([0,0.5*pop])
-#     plt.xticks(size=12)
-#     plt.yticks(size=12)
-#     plt.xlabel("Time (days)",size=12)
-#     plt.ylabel(r"Comulative cases per 100,000 ind",size=12)
-#     if args.type_sim == 'intervention':
-#         plt.title(r'Comulative cases with schools opening ${:.2f}\%$ occupation'.format(args.school_occupation*100))
-#     elif args.type_sim == 'school_alternancy':
-#         plt.title(r'Comulative cases with schools alterning ${:.2f}\%$ occupation'.format(args.school_occupation*100))
-#     # plt.semilogy()
-#     plt.tight_layout()
+    plt.subplot(122)
+    plt.plot(res_mean['tvec'],res_mean['E']*pop,color=interv_color_label[i],alpha=0.6)
+    plt.gca().set_prop_cycle(None)
+    plt.fill_between(res_mean['tvec'],res_loCI['E']*pop,res_upCI['E']*pop,color=interv_color_label[i],alpha=0.3)
+    plt.xlim([0,max(res_mean['tvec'])])
+    plt.ylim([0,0.5*pop])
+    plt.xticks(size=12)
+    plt.yticks(size=12)
+    plt.xlabel("Time (days)",size=12)
+    plt.ylabel(r"Comulative cases per 100,000 ind",size=12)
+    if args.type_sim == 'intervention':
+        plt.title(r'Comulative cases with schools opening ${:.2f}\%$ occupation'.format(args.school_occupation*100))
+    elif args.type_sim == 'school_alternancy':
+        plt.title(r'Comulative cases with schools alterning ${:.2f}\%$ occupation'.format(args.school_occupation*100))
+    # plt.semilogy()
+    plt.tight_layout()
 
-# if not os.path.isdir( os.path.join(figures_path,args.type_sim) ):
-#     os.makedirs( os.path.join(figures_path,args.type_sim) )
+if not os.path.isdir( os.path.join(figures_path,args.type_sim) ):
+    os.makedirs( os.path.join(figures_path,args.type_sim) )
 
-# save_path = os.path.join(figures_path,args.type_sim)
+save_path = os.path.join(figures_path,args.type_sim)
 
-# plt.savefig(os.path.join(figures_path,'{}_dailyIncidence_ComNumber_schoolcap_{}_n_{}.png'.format(args.type_sim,args.school_occupation,str(pop))),
-#             dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+plt.savefig(os.path.join(figures_path,'{}_dailyIncidence_ComNumber_schoolcap_{}_n_{}.png'.format(args.type_sim,args.school_occupation,str(pop))),
+            dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
 
 
-# plt.show()
+plt.show()
 
 
 

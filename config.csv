@@ -1,0 +1,5 @@
+figures_dir,figures
+results_dir,results
+multilayers_dir,multilayers
+bogota_age_data_dir,data/BogotaAgeStructure.txt
+bogota_houses_data_dir,data/HousesCensusBOG.CSV

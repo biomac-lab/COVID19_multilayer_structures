@@ -7,7 +7,7 @@ import itertools
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
+config_data = pd.read_csv('config.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
 multilayers_path = config_data.loc['multilayers_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
@@ -18,11 +18,11 @@ from networks import create_networks
 
 import argparse
 parser = argparse.ArgumentParser(description='Networks visualization.')
-parser.add_argument('--population', default=1000, type=int,
+parser.add_argument('--population', default=2000, type=int,
                     help='Speficy the number of individials')
-parser.add_argument('--save', default=True, type=bool,
+parser.add_argument('--save', default=False, type=bool,
                     help='Speficy if you want to save the networks')
-parser.add_argument('--plot', default=False, type=bool,
+parser.add_argument('--plot', default=True, type=bool,
                     help='Speficy if you want to save the figure')
 
 parser.add_argument('--schools_mean', default=9.4, type=float,
@@ -338,7 +338,7 @@ if args.plot:
     # Plot and save
     print('Creating figures')
     for i in tqdm(range(0,len(multilayer4_G))):
-        plt.figure(figsize=(20,20))
+        plt.figure(figsize=(15,15))
         pos = nx.kamada_kawai_layout(multilayer4_G[i])
         nx.draw(G=multilayer4_G[i], pos=pos, 
             node_size=6,
