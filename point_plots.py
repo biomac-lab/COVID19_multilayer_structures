@@ -29,6 +29,8 @@ args = parser.parse_args()
 number_nodes = args.population
 pop = number_nodes
 
+results_path = os.path.join(results_path,'intervention',str(pop))
+
 ### Read functions
 
 def load_results_dyn(type_res,path=results_path,n=pop):
@@ -48,6 +50,9 @@ def load_results_ints(type_res,n,int_effec,schl_occup,path=results_path):
     read_file = pd.read_csv(read_path)
     return read_file
 
+interv_color_label = ['tab:red','tab:purple','tab:orange']
+if not os.path.isdir( os.path.join(figures_path,'point_plots') ):
+        os.makedirs( os.path.join(figures_path,'point_plots') )
 
 ########################################################################################################################################
 ########################################################################################################################################
@@ -66,7 +71,7 @@ for i, inter_ in enumerate(intervention_effcs):
     for j, cap_ in enumerate(school_caps):
 
         res_read = load_results_ints('soln',args.population,inter_,cap_)
-        res_smooth = model.smooth_timecourse(res_read)
+        #res_smooth = model.smooth_timecourse(res_read)
 
         # if inter_ < 1:
         #     res_read = load_results_ints('soln',args.population,inter_,cap_)
@@ -76,8 +81,8 @@ for i, inter_ in enumerate(intervention_effcs):
         #     res_smooth = model.smooth_timecourse(res_read)
 
         for itr_ in range(10):
-            res_smooth_i = res_smooth['iter'] == itr_
-            res_smooth_i = pd.DataFrame(res_smooth[res_smooth_i])
+            res_smooth_i = res_read['iter'] == itr_
+            res_smooth_i = pd.DataFrame(res_read[res_smooth_i])
             peak_I3 = max(res_smooth_i['I3'])*pop
 
             df_res_i = pd.DataFrame(columns=['iter','interven_eff','school_cap','peak_I3'])
@@ -90,14 +95,18 @@ for i, inter_ in enumerate(intervention_effcs):
 df_peaks_I3 = pd.concat(df_list)
 
 
-plt.figure(figsize=(6, 5))
-sns.pointplot( data=df_peaks_I3, x='school_cap', y='peak_I3', hue='interven_eff', linestyles='')
-#plt.legend(frameon=False,framealpha=0.0,bbox_to_anchor=(0.5,-0.2), loc="lower center")
-plt.xlabel(r'School capacity ($\%$)',size=12)
-plt.ylabel(r'ICUs required in peak',size=12)
-plt.xticks(size=12)
-plt.yticks(size=12)
-plt.show()
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_peaks_I3, x='school_cap', y='peak_I3', hue='interven_eff', linestyles='--',palette='viridis',alpha=0.5)
+#plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(0,1), loc="lower center")
+ax.legend().set_title('')
+plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
+ax.set_ylabel(r'Beds per 100,000',fontsize=17)
+ax.set_title(r'ICUs required in peak',fontsize=17)
+plt.xticks(size=17)
+plt.yticks(size=17)
+save_path = os.path.join(figures_path,'point_plots','ICU_peakbeds_n_{}.png'.format(str(pop)))
+plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
 
 ########################################################################################################################################
 ########################################################################################################################################
@@ -116,7 +125,7 @@ for i, inter_ in enumerate(intervention_effcs):
     for j, cap_ in enumerate(school_caps):
 
         res_read = load_results_ints('soln',args.population,inter_,cap_)
-        res_smooth = model.smooth_timecourse(res_read)
+        #res_smooth = model.smooth_timecourse(res_read)
 
         # if inter_ < 1:
         #     res_read = load_results_ints('soln',args.population,inter_,cap_)
@@ -126,8 +135,8 @@ for i, inter_ in enumerate(intervention_effcs):
         #     res_smooth = model.smooth_timecourse(res_read)
 
         for itr_ in range(10):
-            res_smooth_i = res_smooth['iter'] == itr_
-            res_smooth_i = pd.DataFrame(res_smooth[res_smooth_i])
+            res_smooth_i = res_read['iter'] == itr_
+            res_smooth_i = pd.DataFrame(res_read[res_smooth_i])
             peak_I2 = max(res_smooth_i['I2'])*pop
 
             df_res_i = pd.DataFrame(columns=['iter','interven_eff','school_cap','peak_I2'])
@@ -137,17 +146,21 @@ for i, inter_ in enumerate(intervention_effcs):
             df_res_i['peak_I2']      = peak_I2
             df_list.append(df_res_i)
 
-df_peaks_I3 = pd.concat(df_list)
+df_peaks_I2 = pd.concat(df_list)
 
 
-plt.figure(figsize=(6, 5))
-sns.pointplot( data=df_peaks_I3, x='school_cap', y='peak_I2', hue='interven_eff', linestyles='')
-#plt.legend(frameon=False,framealpha=0.0,bbox_to_anchor=(0.5,-0.2), loc="lower center")
-plt.xlabel(r'School capacity ($\%$)',size=12)
-plt.ylabel(r'Non-ICU beds required in peak',size=12)
-plt.xticks(size=12)
-plt.yticks(size=12)
-plt.show()
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_peaks_I2, x='school_cap', y='peak_I2', hue='interven_eff', linestyles='--',palette='viridis',alpha=0.5)
+#plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(0,1), loc="lower center")
+ax.legend().set_title('')
+plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
+ax.set_ylabel(r'Beds per 100,000',fontsize=17)
+ax.set_title(r'Non-ICUs beds required in peak',fontsize=17)
+plt.xticks(size=17)
+plt.yticks(size=17)
+save_path = os.path.join(figures_path,'point_plots','nonICU_peakbeds_n_{}.png'.format(str(pop)))
+plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
 
 
 
@@ -178,20 +191,26 @@ for i, inter_ in enumerate(intervention_effcs):
             df_res_i['iter']         = [int(itr_)]
             df_res_i['interven_eff'] = r'{}$\%$'.format(int(inter_*100))
             df_res_i['school_cap']   = int(cap_*100)
-            df_res_i['end_dead']      = end_dead
+            df_res_i['end_dead']      = end_dead*pop
             df_list.append(df_res_i)
 
-df_peaks_I3 = pd.concat(df_list)
+df_peaks_D = pd.concat(df_list)
 
 
-plt.figure(figsize=(6, 5))
-sns.pointplot( data=df_peaks_I3, x='school_cap', y='end_dead', hue='interven_eff', linestyles='')
-#plt.legend(frameon=False,framealpha=0.0,bbox_to_anchor=(0.5,-0.2), loc="lower center")
-plt.xlabel(r'School capacity ($\%$)',size=12)
-plt.ylabel(r'Diseased per 100,000 ind',size=12)
-plt.xticks(size=12)
-plt.yticks(size=12)
-plt.show()
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_peaks_D, x='school_cap', y='end_dead', hue='interven_eff', linestyles='--',palette='viridis',alpha=0.5)
+#plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(0,1), loc="lower center")
+ax.legend().set_title('')
+plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
+ax.set_ylabel(r'Deaths per 100,000',fontsize=17)
+ax.set_title(r'Total deaths',fontsize=17)
+plt.xticks(size=17)
+plt.yticks(size=17)
+#plt.show()
+save_path = os.path.join(figures_path,'point_plots','totalDeaths_n_{}.png'.format(str(pop)))
+plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+
 
 
 ########################################################################################################################################
@@ -221,17 +240,22 @@ for i, inter_ in enumerate(intervention_effcs):
             df_res_i['iter']         = [int(itr_)]
             df_res_i['interven_eff'] = r'{}$\%$'.format(int(inter_*100))
             df_res_i['school_cap']   = int(cap_*100)
-            df_res_i['end_cases']      = end_cases
+            df_res_i['end_cases']      = end_cases*pop
             df_list.append(df_res_i)
 
-df_peaks_I3 = pd.concat(df_list)
+df_peaks_E = pd.concat(df_list)
 
 
-plt.figure(figsize=(6, 5))
-sns.pointplot( data=df_peaks_I3, x='school_cap', y='end_cases', hue='interven_eff', linestyles='')
-#plt.legend(frameon=False,framealpha=0.0,bbox_to_anchor=(0.5,-0.2), loc="lower center")
-plt.xlabel(r'School capacity ($\%$)',size=12)
-plt.ylabel(r'Diseased per 100,000 ind',size=12)
-plt.xticks(size=12)
-plt.yticks(size=12)
-plt.show()
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_peaks_E, x='school_cap', y='end_cases', hue='interven_eff', linestyles='--',palette='viridis',alpha=0.5)
+#plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(0,1), loc="lower center")
+ax.legend().set_title('')
+plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
+ax.set_ylabel(r'Infections per 100,000',fontsize=17)
+ax.set_title(r'Total infections',fontsize=17)
+plt.xticks(size=17)
+plt.yticks(size=17)
+#plt.show()
+save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}.png'.format(str(pop)))
+plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
