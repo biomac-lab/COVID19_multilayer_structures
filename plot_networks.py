@@ -18,7 +18,7 @@ from networks import create_networks
 
 import argparse
 parser = argparse.ArgumentParser(description='Networks visualization.')
-parser.add_argument('--population', default=2000, type=int,
+parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--save', default=False, type=bool,
                     help='Speficy if you want to save the networks')
@@ -43,9 +43,9 @@ parser.add_argument('--work_size', default=10, type=float,
 parser.add_argument('--work_r', default=1, type=float,
                     help='Correlation in work layer')
 
-parser.add_argument('--community_mean', default=4.3/2.5, type=float,
+parser.add_argument('--community_mean', default=4.3/2, type=float,
                     help='Community degree distribution (mean)')
-parser.add_argument('--community_std', default=1.9/2.5, type=float,
+parser.add_argument('--community_std', default=1.9/2, type=float,
                     help='Community degree distribution (standard deviation)')
 parser.add_argument('--community_n', default=1, type=float,
                     help='Number of community')
@@ -341,10 +341,10 @@ if args.plot:
         plt.figure(figsize=(15,15))
         pos = nx.kamada_kawai_layout(multilayer4_G[i])
         nx.draw(G=multilayer4_G[i], pos=pos, 
-            node_size=6,
+            node_size=8,
             node_color= 'black',
             edge_color='gray',
-            width=.15,
+            width=.5,
             edge_cmap=plt.cm.Blues, with_labels=False)
         plt.savefig(os.path.join(figures_path, str(pop)+'_{}.png'.format(multilayer4_l[i])), dpi=400, transparent=False, bbox_inches = 'tight', pad_inches = 0.1)
 
