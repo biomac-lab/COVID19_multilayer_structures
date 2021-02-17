@@ -47,14 +47,32 @@ parser.add_argument('--delta_t', default=0.08, type=float,
 parser.add_argument('--number_trials', default=10, type=int,
                     help='Number of iterations per step')
 
-parser.add_argument('--schools_mean', default=9.4, type=float,
-                    help='Schools degree distribution (mean)')
-parser.add_argument('--schools_std', default=1.8, type=float,
-                    help='Schools degree distribution (standard deviation)')
-parser.add_argument('--schools_size', default=35, type=float,
+parser.add_argument('--preschool_mean', default=9.4, type=float,
+                    help='preschool degree distribution (mean)')
+parser.add_argument('--preschool_std', default=1.8, type=float,
+                    help='preschool degree distribution (standard deviation)')
+parser.add_argument('--preschool_size', default=15, type=float,
                     help='Number of students per classroom')
-parser.add_argument('--schools_r', default=1, type=float,
-                    help='Correlation in schools layer')
+parser.add_argument('--preschool_r', default=1, type=float,
+                    help='Correlation in preschool layer')
+
+parser.add_argument('--primary_mean', default=9.4, type=float,
+                    help='primary degree distribution (mean)')
+parser.add_argument('--primary_std', default=1.8, type=float,
+                    help='primary degree distribution (standard deviation)')
+parser.add_argument('--primary_size', default=35, type=float,
+                    help='Number of students per classroom')
+parser.add_argument('--primary_r', default=1, type=float,
+                    help='Correlation in primary layer')
+
+parser.add_argument('--highschool_mean', default=9.4, type=float,
+                    help='highschool degree distribution (mean)')
+parser.add_argument('--highschool_std', default=1.8, type=float,
+                    help='highschool degree distribution (standard deviation)')
+parser.add_argument('--highschool_size', default=35, type=float,
+                    help='Number of students per classroom')
+parser.add_argument('--highschool_r', default=1, type=float,
+                    help='Correlation in highschool layer')
 
 parser.add_argument('--work_mean', default=14.4/3, type=float,
                     help='Work degree distribution (mean)')
@@ -238,37 +256,6 @@ house_indices = np2.repeat(np2.arange(0,len(household_sizes),1), household_sizes
 # Keeping track of the household size for each individual
 track_house_size = np2.repeat(household_sizes, household_sizes)
 
-
-#--------------------------------------------------------------------------------------------------------------------------------------
-
-# Keep track of the 5 yr age groups for each individual labelled from 0-16
-age_tracker_all = np2.zeros(pop)
-
-
-####### Community 
-
-# Degree dist. mean and std div obtained by Prem et al data, scaled by 1/2.5 in order to ensure that community+friends+school = community data in Prem et al
-mean, std = args.community_mean, args.community_std
-p = 1-(std**2/mean)
-n_binom = mean/p
-community_degree = np2.random.binomial(n_binom, p, size = pop)
-
-# No correlation between contacts
-n_community = args.community_n
-r_community = args.community_r
-
-# Split the age group of old population according to the population seen in the data
-prob = []
-for i in range(0,len(community_)):
-    prob.append(community_[i]/sum(community_))
-age_group_community = np2.random.choice(np2.arange(0,len(community_),1),size=pop,p=prob,replace=True)
-
-community_indx = np2.arange(0,pop,1)
-for i in range(pop):
-    age_tracker_all[community_indx[i]] = age_group_community[i]
-
-
-
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
 ###############################
@@ -297,8 +284,194 @@ work_indx = np2.where(classify_pop=='work')[0]
 other_indx = np2.where(classify_pop=='other')[0]
 
 
+# Keep track of the age groups for each individual labelled from 0-16
+age_tracker_all = np2.zeros(pop)
+age_tracker = np2.zeros(pop)
+
 #------------------------------------------------------------------------------------------------------------------------------------------
 
 ###############################
 ##### Degree distribution #####
 
+### Community --------------------------------------------------------
+# Degree dist. mean and std div obtained by Prem et al data, scaled by 1/2.5 in order to ensure that community+friends+school = community data in Prem et al
+mean, std = args.community_mean, args.community_std
+p = 1-(std**2/mean)
+n_binom = mean/p
+community_degree = np2.random.binomial(n_binom, p, size = pop)
+
+# No correlation between contacts
+n_community = args.community_n
+r_community = args.community_r
+
+# Split the age group of old population according to the population seen in the data
+prob = []
+for i in range(0,len(community_)):
+    prob.append(community_[i]/sum(community_))
+age_group_community = np2.random.choice(np2.arange(0,len(community_),1),size=pop,p=prob,replace=True)
+
+community_indx = np2.arange(0,pop,1)
+for i in range(pop):
+    age_tracker_all[community_indx[i]] = age_group_community[i]
+
+
+### Preschool -------------------------------------------------------
+mean, std = args.preschool_mean, args.preschool_std
+p = 1-(std**2/mean)
+n_binom = mean/p
+preschool_degree = np2.random.binomial(n_binom, p, size = preschool_going)
+n_preschool = preschool_going/args.preschool_size
+r_preschool = args.preschool_r
+
+preschool_clroom = np2.random.choice(np.arange(0,n_preschool+1,1),size=preschool_going)
+
+# Assign ages to the preschool going population acc. to their proportion from the census data
+prob = []
+for i in range(0,len(preschool_)):
+    prob.append(preschool_[i]/sum(preschool_))
+age_group_preschool = np2.random.choice(np.arange(0,len(preschool_),1),size=preschool_going,p=prob,replace=True)
+
+for i in range(preschool_going):
+    age_tracker[preschool_indx[i]] = age_group_preschool[i]
+
+
+### Primary ---------------------------------------------------------
+mean, std = args.primary_mean, args.primary_std
+p = 1-(std**2/mean)
+n_binom = mean/p
+primary_degree = np2.random.binomial(n_binom, p, size = primary_going)
+n_primary = primary_going/args.primary_size
+r_primary = args.primary_r
+
+primary_clroom = np2.random.choice(np.arange(0,n_primary+1,1),size=primary_going)
+
+# Assign ages to the primary going population acc. to their proportion from the census data
+prob = []
+for i in range(0,len(primary_)):
+    prob.append(primary_[i]/sum(primary_))
+age_group_primary = np2.random.choice(np.arange(0,len(primary_),1),size=primary_going,p=prob,replace=True)
+
+for i in range(primary_going):
+    age_tracker[primary_indx[i]] = age_group_primary[i]
+
+
+### Highschool -------------------------------------------------------
+mean, std = args.highschool_mean, args.highschool_std
+p = 1-(std**2/mean)
+n_binom = mean/p
+highschool_degree = np2.random.binomial(n_binom, p, size = highschool_going)
+n_highschool = highschool_going/args.highschool_size
+r_highschool = args.highschool_r
+
+highschool_clroom = np2.random.choice(np.arange(0,n_highschool+1,1),size=highschool_going)
+
+# Assign ages to the highschool going population acc. to their proportion from the census data
+prob = []
+for i in range(0,len(highschool_)):
+    prob.append(highschool_[i]/sum(highschool_))
+age_group_highschool = np2.random.choice(np.arange(0,len(highschool_),1),size=highschool_going,p=prob,replace=True)
+
+for i in range(highschool_going):
+    age_tracker[highschool_indx[i]] = age_group_highschool[i]
+
+
+### Work -----------------------------------------------------------
+# Degree dist., the mean and std div have been taken from the Potter et al data. The factor of 1/3 is used to correspond to daily values and is chosen to match with the work contact survey data
+mean, std = args.work_mean, args.work_std
+p = 1-(std**2/mean)
+n_binom = mean/p
+work_degree = np2.random.binomial(n_binom, p, size = working)
+
+# Assuming that on average the size of a work place is ~ 10 people and the correlation is 
+# chosen such that the clustering coeff is high as the network in Potter et al had a pretty high value
+work_place_size = args.work_size
+n_work = working/work_place_size
+r_work = args.work_r
+
+# Assign each working individual a 'work place'
+job_place = np2.random.choice(np.arange(0,n_work+1,1),size=working)
+
+# Split the age group of working population according to the population seen in the data
+p = []
+for i in range(0,len(work_)):
+    p.append(work_[i]/sum(work_))
+age_group_work = np2.random.choice(np.arange(0,len(work_),1),size=working,p=p,replace=True)
+
+for i in range(working):
+    age_tracker[work_indx[i]] = age_group_work[i]
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+###############################
+######## Create graphs ########
+
+print('Creating graphs...')
+
+## Households
+matrix_household = create_networks.create_fully_connected(household_sizes,np2.arange(0,pop,1),args.R0,args.MILDINF_DURATION,args.delta_t)
+
+# Get row, col, data information from the sparse matrices
+# Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
+matrix_household_row = np.asarray(np2.asarray(matrix_household[0]))
+matrix_household_col = np.asarray(np2.asarray(matrix_household[1]))
+matrix_household_data = np.asarray(np2.asarray(matrix_household[2]))
+
+## Preschool
+matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+
+matrix_preschool_row = np.asarray(np2.asarray(matrix_preschool[0]))
+matrix_preschool_col = np.asarray(np2.asarray(matrix_preschool[1]))
+matrix_preschool_data = np.asarray(np2.asarray(matrix_preschool[2]))
+
+## Primary
+matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+
+matrix_primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+matrix_primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+matrix_primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+## Highschool
+matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+
+matrix_highschool_row = np.asarray(np2.asarray(matrix_highschool[0]))
+matrix_highschool_col = np.asarray(np2.asarray(matrix_highschool[1]))
+matrix_highschool_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+## Community
+matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,np2.arange(0,pop,1),age_group_community,args.R0,args.MILDINF_DURATION,args.delta_t)
+
+matrix_community_row = np.asarray(np2.asarray(matrix_community[0]))
+matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
+matrix_community_data = np.asarray(np2.asarray(matrix_community[2]))
+
+# Saves graphs
+multilayer_matrix = [matrix_household,,matrix_preschool,matrix_primary,matrix_highschool,matrix_community]
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+#########################################
+######## Create dynamical layers ########
+
+
+# Time paramas
+Tmax = args.Tmax
+days_intervals = [1] * Tmax
+delta_t = args.delta_t
+step_intervals = [int(x/delta_t) for x in days_intervals]
+total_steps = sum(step_intervals)
+
+# Create dynamic
+import networks.network_dynamics as nd
+
+print('Creating dynamics...')
+if args.school_alternancy:
+
+    time_intervals, ws = nd.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+
+else:
+
+    time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
