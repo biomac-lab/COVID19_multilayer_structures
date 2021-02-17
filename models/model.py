@@ -260,43 +260,6 @@ def simulate_intervals(
 
   return key, state, state_timer, states_cumulative, history
 
-def plot_single(history,tvec,n,ymax=1,scale=1,int=0,Tint=0,plotThis=False,plotName="test"):
-  """
-  plots the output (prevalence) from a single simulation, with or without an intervention
-  history: 2D array of values for each variable at each timepoint
-  tvec: 1D vector of timepoints
-  ymax : Optional, highest value on y axis, relative to "scale" value (e.g. 0.5 makes ymax=0.5 or 50% for scale=1 or N)
-  scale: Optional, amount to multiple all frequency values by (e.g. "1" keeps as frequency, "n" turns to absolute values)
-  int: Optional, 1 or 0 for whether or not there was an intervention. Defaults to 0
-  Tint: Optional, timepoint (days) at which intervention was started
-  plotThis: True or False, whether a plot will be saved as pdf 
-  plotName: string, name of the plot to be saved
-  """
- 
-  plt.figure(figsize=(2*6.4, 4.0))
-  plt.subplot(121)
-  plt.plot(tvec,history*scale)
-  plt.legend(['S', 'E', 'I1', 'I2', 'I3', 'D', 'R'],frameon=False,framealpha=0.0,bbox_to_anchor=(1.04,1), loc="upper left")
-  if int==1:
-      plt.plot([Tint,Tint],[0,ymax*scale],'k--')
-  plt.ylim([0,ymax*scale])
-  plt.xlabel("Time (days)")
-  plt.ylabel("Number")
-
-  plt.subplot(122)
-  plt.plot(tvec,history*scale)
-  plt.legend(['S', 'E', 'I1', 'I2', 'I3', 'D', 'R'],frameon=False,framealpha=0.0,bbox_to_anchor=(1.04,1), loc="upper left")
-  if int==1:
-    plt.plot([Tint,Tint],[scale/n,ymax*scale],'k--')
-  plt.semilogy()
-  plt.ylim([scale/n,ymax*scale])
-  plt.xlabel("Time (days)")
-  plt.ylabel("Number")
-  plt.tight_layout()
-  if plotThis==True:
-  	plt.savefig(plotName+'.pdf',bbox_inches='tight')
-  plt.show()
-
 def plot_single_cumulative(cumulative_history,tvec,n,ymax=1,scale=1,int=0,Tint=0,plotThis=False,plotName="test"):
   """
   plots the output (cumulative prevalence) from a single simulation, with or without an intervention

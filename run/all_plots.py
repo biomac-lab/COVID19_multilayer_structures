@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 from matplotlib import figure
 import pandas as pd
 import seaborn as sns
