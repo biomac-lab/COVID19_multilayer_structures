@@ -18,6 +18,7 @@ from models import model
 config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
 results_path = config_data.loc['results_dir'][1]
+params_data_path = config_data.loc['bogota_params_ages_data'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
 houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
 teachers_data_path = config_data.loc['bogota_teachers_data_dir'][1]
@@ -140,8 +141,8 @@ scale_vec=(std_vec**2)/mean_vec # This will contain scale values for each state
 # Define transition probabilities
 
 # Define probability of recovering (as opposed to progressing or dying) from each state
-recovery_probabilities = np.array([0., 0., FracMild, FracSevere / (FracSevere + FracCritical), 1. - CFR / FracCritical, 0., 0.])
-
+recovery_probabilities = np.array([0., 0., Fcommunity_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + work_ + elderly_
+community = sum(community_)/total_pop_BOG
 # Define relative infectivity of each state
 infection_probabilities = np.array([0., 0., 1.0, 0., 0., 0., 0.])
 
@@ -235,8 +236,91 @@ community_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + w
 community = sum(community_)/total_pop_BOG
 
 # Adult classification
-
 adults = np.arange(4,16+1,1)
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+#################################
+########### Age params ##########
+
+### Get medians 
+def get_medians(df_p,last):
+    df_res = df_p.iloc[-last:].groupby(['param']).median().reset_index()['median'][0]
+    return df_res
+
+def medians_params(df_list,age_group,last):    
+    params_def = ['age','beta','IFR','RecPeriod','alpha','sigma']
+    params_val = [age_group,get_medians(df_list[0],last),get_medians(df_list[1],last),
+                  get_medians(df_list[2],last),get_medians(df_list[3],last),get_medians(df_list[4],last)]
+    res = dict(zip(params_def,params_val))
+    return res
+
+params_data_BOG = pd.read_csv(params_data_path, encoding='unicode_escape', delimiter=',')
+
+# Ages 0-19
+young_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='0-19'])
+young_ages_beta = pd.DataFrame(young_ages_params[young_ages_params['param']=='contact_rate'])
+young_ages_IFR = pd.DataFrame(young_ages_params[young_ages_params['param']=='IFR'])
+young_ages_RecPeriod = pd.DataFrame(young_ages_params[young_ages_params['param']=='recovery_period'])
+young_ages_alpha = pd.DataFrame(young_ages_params[young_ages_params['param']=='report_rate'])
+young_ages_sigma = pd.DataFrame(young_ages_params[young_ages_params['param']=='relative_asymp_transmission'])
+young_params = [young_ages_beta,young_ages_IFR,young_ages_RecPeriod,young_ages_alpha,young_ages_sigma]
+
+# Ages 20-39
+youngAdults_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='20-39'])
+youngAdults_ages_beta = pd.DataFrame(youngAdults_ages_params[youngAdults_ages_params['param']=='contact_rate'])
+youngAdults_ages_IFR = pd.DataFrame(youngAdults_ages_params[youngAdults_ages_params['param']=='IFR'])
+youngAdults_ages_RecPeriod = pd.DataFrame(youngAdults_ages_params[youngAdults_ages_params['param']=='recovery_period'])
+youngAdults_ages_alpha = pd.DataFrame(youngAdults_ages_params[youngAdults_ages_params['param']=='report_rate'])
+youngAdults_ages_sigma = pd.DataFrame(youngAdults_ages_params[youngAdults_ages_params['param']=='relative_asymp_transmission'])
+youngAdults_params = [youngAdults_ages_beta,youngAdults_ages_IFR,youngAdults_ages_RecPeriod,youngAdults_ages_alpha,youngAdults_ages_sigma]
+
+# Ages 40-49
+adults_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='40-49'])
+adults_ages_beta = pd.DataFrame(adults_ages_params[adults_ages_params['param']=='contact_rate'])
+adults_ages_IFR = pd.DataFrame(adults_ages_params[adults_ages_params['param']=='IFR'])
+adults_ages_RecPeriod = pd.DataFrame(adults_ages_params[adults_ages_params['param']=='recovery_period'])
+adults_ages_alpha = pd.DataFrame(adults_ages_params[adults_ages_params['param']=='report_rate'])
+adults_ages_sigma = pd.DataFrame(adults_ages_params[adults_ages_params['param']=='relative_asymp_transmission'])
+adults_params = [adults_ages_beta,adults_ages_IFR,adults_ages_RecPeriod,adults_ages_alpha,adults_ages_sigma]
+
+# Ages 50-59
+seniorAdults_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='50-59'])
+seniorAdults_ages_beta = pd.DataFrame(seniorAdults_ages_params[seniorAdults_ages_params['param']=='contact_rate'])
+seniorAdults_ages_IFR = pd.DataFrame(seniorAdults_ages_params[seniorAdults_ages_params['param']=='IFR'])
+seniorAdults_ages_RecPeriod = pd.DataFrame(seniorAdults_ages_params[seniorAdults_ages_params['param']=='recovery_period'])
+seniorAdults_ages_alpha = pd.DataFrame(seniorAdults_ages_params[seniorAdults_ages_params['param']=='report_rate'])
+seniorAdults_ages_sigma = pd.DataFrame(seniorAdults_ages_params[seniorAdults_ages_params['param']=='relative_asymp_transmission'])
+seniorAdults_params = [seniorAdults_ages_beta,seniorAdults_ages_IFR,seniorAdults_ages_RecPeriod,seniorAdults_ages_alpha,seniorAdults_ages_sigma]
+
+# Ages 60-69
+senior_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='60-69'])
+senior_ages_beta = pd.DataFrame(senior_ages_params[senior_ages_params['param']=='contact_rate'])
+senior_ages_IFR = pd.DataFrame(senior_ages_params[senior_ages_params['param']=='IFR'])
+senior_ages_RecPeriod = pd.DataFrame(senior_ages_params[senior_ages_params['param']=='recovery_period'])
+senior_ages_alpha = pd.DataFrame(senior_ages_params[senior_ages_params['param']=='report_rate'])
+senior_ages_sigma = pd.DataFrame(senior_ages_params[senior_ages_params['param']=='relative_asymp_transmission'])
+senior_params = [senior_ages_beta,senior_ages_IFR,senior_ages_RecPeriod,senior_ages_alpha,senior_ages_sigma]
+
+# Ages 70+
+elderly_ages_params = pd.DataFrame(params_data_BOG[params_data_BOG['age_group']=='70-90+'])
+elderly_ages_beta = pd.DataFrame(elderly_ages_params[elderly_ages_params['param']=='contact_rate'])
+elderly_ages_IFR = pd.DataFrame(elderly_ages_params[elderly_ages_params['param']=='IFR'])
+elderly_ages_RecPeriod = pd.DataFrame(elderly_ages_params[elderly_ages_params['param']=='recovery_period'])
+elderly_ages_alpha = pd.DataFrame(elderly_ages_params[elderly_ages_params['param']=='report_rate'])
+elderly_ages_sigma = pd.DataFrame(elderly_ages_params[elderly_ages_params['param']=='relative_asymp_transmission'])
+elderly_params = [elderly_ages_beta,elderly_ages_IFR,elderly_ages_RecPeriod,elderly_ages_alpha,elderly_ages_sigma]
+
+
+young_params_medians = medians_params(young_params,'0-19',last=15)
+youngAdults_params_medians = medians_params(youngAdults_params,'20-39',last=15)
+adults_params_medians = medians_params(adults_params,'40-49',last=15)
+seniorAdults_params_medians = medians_params(seniorAdults_params,'50-59',last=15)
+senior_params_medians = medians_params(senior_params,'60-69',last=15)
+elderly_params_medians = medians_params(elderly_params,'70-90+',last=15)
+
+
+
 
 
 #------------------------------------------------------------------------------------------------------------------------------------
