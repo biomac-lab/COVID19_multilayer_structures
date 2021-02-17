@@ -3,3 +3,4 @@ results_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/res
 multilayers_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/multilayers
 bogota_age_data_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/data/BogotaAgeStructure.txt
 bogota_houses_data_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/data/HousesCensusBOG.CSV
+bogota_teachers_data_dir,/home/samueltof/Documents/Projects/COVID19_multilayer_structures/data/teachers/teacher_level_distribution_bogota.csv

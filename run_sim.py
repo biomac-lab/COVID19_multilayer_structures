@@ -20,6 +20,7 @@ figures_path = config_data.loc['figures_dir'][1]
 results_path = config_data.loc['results_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
 houses_data_path = config_data.loc['bogota_houses_data_dir'][1]
+teachers_data_path = config_data.loc['bogota_teachers_data_dir'][1]
 
 #from networks import networks
 from networks import create_networks
@@ -176,6 +177,24 @@ def state_length_sampler(key, new_state):
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
+######################################
+######## Teachers distribution #######
+
+teachers_data_BOG = pd.read_csv(teachers_data_path, encoding= 'unicode_escape', delimiter=',')
+total_teachers_BOG = int(teachers_data_BOG['Total'][1])
+
+teachers_preschool_ = [int(teachers_data_BOG['Preescolar'][1])]
+teachers_preschool = sum(teachers_preschool_)/total_teachers_BOG
+
+teachers_primary_ = [int(teachers_data_BOG['Basica_primaria'][1])]
+teachers_primary = sum(teachers_primary_)/total_teachers_BOG
+
+teachers_highschool_ = [int(teachers_data_BOG['Basica_secundaria'][1])]
+teachers_highschool = sum(teachers_highschool_)/total_teachers_BOG
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
 #################################
 ######## Age distribution #######
 
@@ -183,37 +202,41 @@ def state_length_sampler(key, new_state):
 ages_data_BOG = pd.read_csv(ages_data_path, encoding= 'unicode_escape', delimiter=';')
 total_pop_BOG = int(ages_data_BOG['Total.3'][17].replace('.',''))
 
-# Ages 0-4
+# Ages 0-4 (0)
 very_young_ = [int(ages_data_BOG['Total.3'][0].replace('.',''))]
 very_young = sum(very_young_)/total_pop_BOG
 
-# Ages 5-9
+# Ages 5-9 (1)
 preschool_ = [int(ages_data_BOG['Total.3'][1].replace('.',''))]
 preschool = sum(preschool_)/total_pop_BOG
 
-# Ages 10-14
+# Ages 10-14 (2)
 primary_ = [int(ages_data_BOG['Total.3'][2].replace('.',''))]
 primary = sum(primary_)/total_pop_BOG
 
-# Ages 15-19
+# Ages 15-19 (3)
 highschool_ = [int(ages_data_BOG['Total.3'][3].replace('.',''))]
 highschool = sum(highschool_)/total_pop_BOG
 
-# Ages 20-24
+# Ages 20-24 (4)
 university_ = [int(ages_data_BOG['Total.3'][4].replace('.',''))]
 university = sum(university_)/total_pop_BOG
 
-# Ages 25-64
+# Ages 25-64 (5,6,7,8,9,10,11,12)
 work_ = [int(ages_data_BOG['Total.3'][i].replace('.','')) for i in range(5,12+1)]
 work = sum(work_)/total_pop_BOG
 
-# Ages 65+
+# Ages 65+ (13,14,15,16)
 elderly_ = [int(ages_data_BOG['Total.3'][i].replace('.','')) for i in range(13,16+1)]
 elderly = sum(elderly_)/total_pop_BOG
 
 # Community ages
 community_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + work_ + elderly_
 community = sum(community_)/total_pop_BOG
+
+# Adult classification
+
+adults = np.arange(4,16+1,1)
 
 
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -261,8 +284,25 @@ track_house_size = np2.repeat(household_sizes, household_sizes)
 ###############################
 ######## Classify nodes #######
 
+preschool_pop_ = preschool_ + teachers_preschool_
+preschool_pop = sum(preschool_pop_)
+
+primary_pop_ = primary_ + teachers_primary_
+primary_pop = sum(primary_pop_)
+
+highschool_pop_ = highschool_ + teachers_highschool_
+highschool_pop = sum(highschool_pop_)
+
+work_pop_no_teachers = sum(work_) - total_teachers_BOG
+
 # Frac of population that is school going, working, preschool or elderly
-dist_of_pop = [preschool,primary,highschool,work,very_young+university+elderly]
+dist_of_pop = [preschool_pop/total_pop_BOG,
+               primary_pop/total_pop_BOG,
+               highschool_pop/total_pop_BOG,
+               work_pop_no_teachers/total_pop_BOG,
+               very_young+university+elderly]
+
+dist_of_pop[-1] += 1-sum(dist_of_pop)
 
 # Classifying each person
 classify_pop = np2.random.choice(['preschool','primary','highschool','work','other'], size=pop, p=dist_of_pop)
@@ -327,9 +367,12 @@ preschool_clroom = np2.random.choice(np.arange(0,n_preschool+1,1),size=preschool
 
 # Assign ages to the preschool going population acc. to their proportion from the census data
 prob = []
-for i in range(0,len(preschool_)):
-    prob.append(preschool_[i]/sum(preschool_))
-age_group_preschool = np2.random.choice(np.arange(0,len(preschool_),1),size=preschool_going,p=prob,replace=True)
+preschool_pop_ = preschool_ + teachers_preschool_
+preschool_pop = sum(preschool_pop_)
+
+for i in range(0,len(preschool_pop_)):
+    prob.append(preschool_pop_[i]/preschool_pop)
+age_group_preschool = np2.random.choice(np.array([1,7]),size=preschool_going,p=prob,replace=True)
 
 for i in range(preschool_going):
     age_tracker[preschool_indx[i]] = age_group_preschool[i]
@@ -347,9 +390,12 @@ primary_clroom = np2.random.choice(np.arange(0,n_primary+1,1),size=primary_going
 
 # Assign ages to the primary going population acc. to their proportion from the census data
 prob = []
-for i in range(0,len(primary_)):
-    prob.append(primary_[i]/sum(primary_))
-age_group_primary = np2.random.choice(np.arange(0,len(primary_),1),size=primary_going,p=prob,replace=True)
+primary_pop_ = primary_ + teachers_primary_
+primary_pop = sum(primary_pop_)
+
+for i in range(0,len(primary_pop_)):
+    prob.append(primary_pop_[i]/primary_pop)
+age_group_primary = np2.random.choice(np.array([2,7]),size=primary_going,p=prob,replace=True)
 
 for i in range(primary_going):
     age_tracker[primary_indx[i]] = age_group_primary[i]
@@ -367,9 +413,12 @@ highschool_clroom = np2.random.choice(np.arange(0,n_highschool+1,1),size=highsch
 
 # Assign ages to the highschool going population acc. to their proportion from the census data
 prob = []
-for i in range(0,len(highschool_)):
-    prob.append(highschool_[i]/sum(highschool_))
-age_group_highschool = np2.random.choice(np.arange(0,len(highschool_),1),size=highschool_going,p=prob,replace=True)
+highschool_pop_ = highschool_ + teachers_highschool_
+highschool_pop = sum(highschool_pop_)
+
+for i in range(0,len(highschool_pop_)):
+    prob.append(highschool_pop_[i]/highschool_pop)
+age_group_highschool = np2.random.choice(np.array([3,7]),size=highschool_going,p=prob,replace=True)
 
 for i in range(highschool_going):
     age_tracker[highschool_indx[i]] = age_group_highschool[i]
@@ -391,11 +440,14 @@ r_work = args.work_r
 # Assign each working individual a 'work place'
 job_place = np2.random.choice(np.arange(0,n_work+1,1),size=working)
 
-# Split the age group of working population according to the population seen in the data
+# Split the age group of working population according to the populapreschool_tion seen in the data
 p = []
-for i in range(0,len(work_)):
-    p.append(work_[i]/sum(work_))
-age_group_work = np2.random.choice(np.arange(0,len(work_),1),size=working,p=p,replace=True)
+work_pop_ = university_ + work_
+work_pop = sum(work_pop_)
+
+for i in range(0,len(work_pop_)):
+    p.append(work_pop_[i]/work_pop)
+age_group_work = np2.random.choice(np.arange(4,12+1,1),size=working,p=p,replace=True)
 
 for i in range(working):
     age_tracker[work_indx[i]] = age_group_work[i]
@@ -421,7 +473,7 @@ matrix_household_data = np.asarray(np2.asarray(matrix_household[2]))
 matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
 
 matrix_preschool_row = np.asarray(np2.asarray(matrix_preschool[0]))
-matrix_preschool_col = np.asarray(np2.asarray(matrix_preschool[1]))
+matrix_preschool_col = np.asarray(np2.asarray(matrix_preschool[2]))
 matrix_preschool_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
 ## Primary
@@ -446,7 +498,7 @@ matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
 matrix_community_data = np.asarray(np2.asarray(matrix_community[2]))
 
 # Saves graphs
-multilayer_matrix = [matrix_household,,matrix_preschool,matrix_primary,matrix_highschool,matrix_community]
+multilayer_matrix = [matrix_household,matrix_preschool,matrix_primary,matrix_highschool,matrix_community]
 
 
 #--------------------------------------------------------------------------------------------------------------------------------------
