@@ -460,7 +460,10 @@ def create_day_intervention_altern_schools_dynamics(Graphs_matrix,Tmax,total_ste
 
     w_interv_intervals_schl_close = [m_w_interv,e_w_interv_schl_close,n_w_interv]
     w_interv_intervals_schl_open_set1  = [m_w_interv,e_w_interv_schl_open_set1,n_w_interv]
-    w_interv_intervals_schl_open_set1  = [m_w_interv,e_w_interv_schl_open_set2,n_w_interv]    
+    w_interv_intervals_schl_open_set1  = [m_w_interv,e_w_interv_schl_open_set2,n_w_interv]   
+
+    altern_period = 8   # days
+    days = 0 
 
     sim_intervals = []  # iterations per network set w
     sim_ws        = []  # networks per iteration
@@ -469,11 +472,12 @@ def create_day_intervention_altern_schools_dynamics(Graphs_matrix,Tmax,total_ste
             sim_intervals.extend(days_intervals)
             sim_ws.extend(w_interv_intervals_schl_close)
         else:
-            if (i%2) == 0:
+            if days < altern_period:
                 sim_intervals.extend(days_intervals)
                 sim_ws.extend(w_interv_intervals_schl_open_set1)
             else:
                 sim_intervals.extend(days_intervals)
                 sim_ws.extend(w_interv_intervals_schl_open_set1)
+        days += 1
 
     return sim_intervals, sim_ws
