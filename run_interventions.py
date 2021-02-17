@@ -370,8 +370,8 @@ hosp_beds = 5369
 ICU_beds  = 1351
 deaths    = 13125
 
-BOG_E = int( pop * (cum_cases-cum_rec-mild_house-deaths)/total_pop_BOG)
-BOG_R = int( pop * 0.3 )    # Assuming that 30% of population is already recovered
+BOG_E  = int( pop * (cum_cases-cum_rec-mild_house-deaths)/total_pop_BOG)
+BOG_R  = int( pop * 0.3 )    # Assuming that 30% of population is already recovered
 BOG_I1 = int( pop * mild_house/total_pop_BOG )
 BOG_I2 = int( pop * hosp_beds/total_pop_BOG )
 BOG_I3 = int( pop * ICU_beds/total_pop_BOG )
