@@ -260,6 +260,7 @@ def simulate_intervals(
 
   return key, state, state_timer, states_cumulative, history
 
+
 def plot_single_cumulative(cumulative_history,tvec,n,ymax=1,scale=1,int=0,Tint=0,plotThis=False,plotName="test"):
   """
   plots the output (cumulative prevalence) from a single simulation, with or without an intervention
