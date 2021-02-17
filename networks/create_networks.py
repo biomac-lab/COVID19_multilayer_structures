@@ -7,9 +7,7 @@ import scipy.stats as ss
 from collections import Counter
 
 def calculate_individual_degree(rows):
-
     node_degree = dict(Counter(rows).items()) # Node degree
-
     return node_degree
 
 
