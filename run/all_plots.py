@@ -23,7 +23,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
-parser.add_argument('--population', default=100000, type=int,
+parser.add_argument('--population', default=10000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--type_sim', default='intervention', type=str,
                     help='Speficy the type of simulation to plot')
@@ -61,11 +61,11 @@ def load_results_ints(type_res,n,int_effec,schl_occup,path=results_path):
 
 results_path = os.path.join(results_path,'intervention',str(pop))
 
-intervention_effcs = [0.2,0.4,0.6,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
-interv_color_label = ['tab:red','tab:purple','tab:orange','k']
+intervention_effcs = [0.0,0.2,0.4,0.6] #,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
+interv_color_label = ['k','tab:red','tab:purple','tab:orange']
 
-school_caps        = [0.15,0.25,0.35,0.55,1.0]
+school_caps        = [1.0] #[0.15,0.25,0.35,0.55,1.0]
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 plot_state = 'E'
@@ -76,31 +76,31 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
     plt.figure(figsize=(6,4))  # create figure
     for i, inter_ in enumerate(intervention_effcs):
         # read results
-        if inter_ < 1.0:
-            res_read = load_results_ints('soln',args.population,inter_,cap_,path=results_path)
-            res_median = res_read.groupby('tvec').median(); res_median = res_median.reset_index()
-            res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
-            res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
+        # if inter_ < 1.0:
+        res_read = load_results_ints('soln',args.population,inter_,cap_,path=results_path)
+        res_median = res_read.groupby('tvec').median(); res_median = res_median.reset_index()
+        res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
+        res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
         # read results with no intervention
-        elif inter_ == 1.0:
-            res_read = load_results_dyn('soln',os.path.join('results','no_intervention',str(pop)))
-            res_median = res_read.groupby('tvec').median(); res_median = res_median.reset_index()
-            res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
-            res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
+        # elif inter_ == 1.0:
+        #     res_read = load_results_dyn('soln',os.path.join('results','no_intervention',str(pop)))
+        #     res_median = res_read.groupby('tvec').median(); res_median = res_median.reset_index()
+        #     res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
+        #     res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
         # plot
-        plt.plot(res_median['tvec'],res_median[plot_state]*100,color=interv_color_label[i])
+        plt.plot(res_median['tvec'],res_median[plot_state]*pop,color=interv_color_label[i])
         plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(1,1), loc="best")
         plt.gca().set_prop_cycle(None)
-        plt.fill_between(res_median['tvec'],res_loCI[plot_state]*100,res_upCI[plot_state]*100,color=interv_color_label[i],alpha=0.3)
+        plt.fill_between(res_median['tvec'],res_loCI[plot_state]*pop,res_upCI[plot_state]*pop,color=interv_color_label[i],alpha=0.3)
         plt.axvspan(0,20,color='gray',alpha=0.05)
-        plt.annotate('Schools \n closed',(0,2.5),size=9)
-        plt.annotate('Schools \n open',(22,2.5),size=9)
+        plt.annotate('Schools \n closed',(0,500),size=9)
+        plt.annotate('Schools \n open',(22,500),size=9)
         plt.xlim([0,max(res_median['tvec'])])
-        plt.ylim([0,0.03*100])
+        plt.ylim([0,0.065*pop])
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
-        plt.ylabel(r"$\%$ new cases per 100,000 ind",size=12)
+        plt.ylabel(r"New cases per 10,000 ind",size=12)
         if args.type_sim == 'intervention':
             plt.title(r'New cases with schools opening ${}\%$ occupation'.format(int(cap_*100)))
         elif args.type_sim == 'school_alternancy':
@@ -111,10 +111,10 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
 
     save_path = os.path.join(figures_path,'cases_evolution','{}_lin_{}_dynamics_schoolcap_{}_n_{}.png'.format(plot_state,args.type_sim,cap_,str(pop)))
 
-    #plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
-    plt.show()
+    plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+    #plt.show()
 
-
+school_caps        = [0.35] #[0.15,0.25,0.35,0.55,1.0]
 plot_state = 'D'
 alpha = 0.05
 # lineal
@@ -134,19 +134,19 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
             res_loCI = res_read.groupby('tvec').quantile(alpha/2); res_loCI = res_loCI.reset_index()
             res_upCI = res_read.groupby('tvec').quantile(1-alpha/2); res_upCI = res_upCI.reset_index()
         # plot
-        plt.plot(res_median['tvec'],res_median[plot_state]*100,color=interv_color_label[i])
+        plt.plot(res_median['tvec'],res_median[plot_state]*pop,color=interv_color_label[i])
         plt.legend(interv_legend_label,frameon=False,framealpha=0.0,bbox_to_anchor=(1,1), loc="best")
         plt.gca().set_prop_cycle(None)
-        plt.fill_between(res_median['tvec'],res_loCI[plot_state]*100,res_upCI[plot_state]*100,color=interv_color_label[i],alpha=0.3)
+        plt.fill_between(res_median['tvec'],res_loCI[plot_state]*pop,res_upCI[plot_state]*pop,color=interv_color_label[i],alpha=0.3)
         plt.axvspan(0,20,color='gray',alpha=0.05)
-        plt.annotate('Schools \n closed',(0,1.2),size=9)
-        plt.annotate('Schools \n open',(22,1.2),size=9)
+        plt.annotate('Schools \n closed',(0,150),size=9)
+        plt.annotate('Schools \n open',(22,150),size=9)
         plt.xlim([0,max(res_median['tvec'])])
-        plt.ylim([0,0.015*100])
+        plt.ylim([0,0.02*pop])
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
-        plt.ylabel(r"$\%$ Deaths per 100,000 ind",size=12)
+        plt.ylabel(r"Deaths per 10,000 ind",size=12)
         if args.type_sim == 'intervention':
             plt.title(r'Deaths with schools opening ${}\%$ occupation'.format(int(cap_*100)))
         elif args.type_sim == 'school_alternancy':
@@ -392,10 +392,12 @@ plt.show()
 ### PLot comulative number
 
 
-intervention_effcs = [0.2,0.4,0.6,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency',r'No intervention, schools $100\%$ occupation']
-interv_color_label = ['tab:red','tab:purple','tab:orange','k']
-school_caps        = [0.35]#[0.15,0.25,0.35,0.55,1.0]
+
+intervention_effcs = [0.0,0.2,0.4,0.6] #,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
+interv_color_label = ['k','tab:red','tab:purple','tab:orange']
+
+school_caps        = [0.35] #[0.15,0.25,0.35,0.55,1.0]
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 plot_state = 'E'
@@ -421,18 +423,18 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
         plt.gca().set_prop_cycle(None)
         plt.fill_between(res_median['tvec'],res_loCI[plot_state]*pop,res_upCI[plot_state]*pop,color=interv_color_label[i],alpha=0.3)
         plt.axvspan(0,20,color='k',alpha=0.035)
-        plt.annotate('Schools \n closed',(0,20000),size=9)
-        plt.annotate('Schools \n open',(22,20000),size=9)
+        plt.annotate('Schools \n closed',(0,6000),size=9)
+        plt.annotate('Schools \n open',(22,6000),size=9)
         plt.xlim([0,max(res_median['tvec'])])
-        plt.ylim([0,0.6*pop])
+        plt.ylim([0,0.9*pop])
         plt.xticks(size=12)
         plt.yticks(size=12)
         plt.xlabel("Time (days)",size=12)
-        plt.ylabel(r"Comulative cases per 100,000 ind",size=12)
+        plt.ylabel(r"Cumulative cases per 10,000 ind",size=12)
         if args.type_sim == 'intervention':
-            plt.title(r'Comulative cases with schools opening ${}\%$ occupation'.format(int(cap_*100)))
+            plt.title(r'Cumulative cases with schools opening ${}\%$ occupation'.format(int(cap_*100)))
         elif args.type_sim == 'school_alternancy':
-            plt.title(r'Comulative cases with schools alterning ${}\%$ occupation'.format(int(cap_*100)))
+            plt.title(r'Cumulative cases with schools alterning ${}\%$ occupation'.format(int(cap_*100)))
         plt.tight_layout()
 
         if not os.path.isdir( os.path.join(figures_path,'comulative_cases') ):

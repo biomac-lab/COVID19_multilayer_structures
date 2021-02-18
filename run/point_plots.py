@@ -20,7 +20,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
-parser.add_argument('--population', default=100000, type=int,
+parser.add_argument('--population', default=10000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--type_sim', default='intervention', type=str,
                     help='Speficy the type of simulation to plot')
@@ -62,8 +62,8 @@ if not os.path.isdir( os.path.join(figures_path,'point_plots') ):
 
 # UCI peaks
 
-intervention_effcs = [0.2,0.4,0.6]#,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency']#,r'No intervention, schools $100\%$ occupation']
+intervention_effcs = [0.0,0.2,0.4,0.6]#,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 school_caps        = [0.15,0.25,0.35,0.55,1.0]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
@@ -101,7 +101,7 @@ sns.pointplot(ax=ax, data=df_peaks_I3, x='school_cap', y='peak_I3', hue='interve
 ax.legend().set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
-ax.set_ylabel(r'Beds per 100,000',fontsize=17)
+ax.set_ylabel(r'Beds per 10,000',fontsize=17)
 ax.set_title(r'ICUs required in peak',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
@@ -115,9 +115,8 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 ########################################################################################################################################
 
 # No-UCI peaks
-
-intervention_effcs = [0.2,0.4,0.6]#,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency']#,r'No intervention, schools $100\%$ occupation']
+intervention_effcs = [0.0,0.2,0.4,0.6]#,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 school_caps        = [0.15,0.25,0.35,0.55,1.0]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
@@ -155,7 +154,7 @@ sns.pointplot(ax=ax, data=df_peaks_I2, x='school_cap', y='peak_I2', hue='interve
 ax.legend().set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
-ax.set_ylabel(r'Beds per 100,000',fontsize=17)
+ax.set_ylabel(r'Beds per 10,000',fontsize=17)
 ax.set_title(r'Non-ICUs beds required in peak',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
@@ -172,8 +171,8 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 
 # Final deaths
 
-intervention_effcs = [0.2,0.4,0.6]#,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency']#,r'No intervention, schools $100\%$ occupation']
+intervention_effcs = [0.0,0.2,0.4,0.6]#,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 school_caps        = [0.15,0.25,0.35,0.55,1.0]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
@@ -203,7 +202,7 @@ sns.pointplot(ax=ax, data=df_peaks_D, x='school_cap', y='end_dead', hue='interve
 ax.legend().set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
-ax.set_ylabel(r'Deaths per 100,000',fontsize=17)
+ax.set_ylabel(r'Deaths per 10,000',fontsize=17)
 ax.set_title(r'Total deaths',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
@@ -221,8 +220,8 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 
 # Final cases
 
-intervention_effcs = [0.2,0.4,0.6]#,1.0]
-interv_legend_label = [r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency']#,r'No intervention, schools $100\%$ occupation']
+intervention_effcs = [0.0,0.2,0.4,0.6]#,1.0]
+interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 school_caps        = [0.15,0.25,0.35,0.55,1.0]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
@@ -252,7 +251,7 @@ sns.pointplot(ax=ax, data=df_peaks_E, x='school_cap', y='end_cases', hue='interv
 ax.legend().set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
-ax.set_ylabel(r'Infections per 100,000',fontsize=17)
+ax.set_ylabel(r'Infections per 10,000',fontsize=17)
 ax.set_title(r'Total infections',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
