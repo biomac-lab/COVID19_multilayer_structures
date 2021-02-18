@@ -14,23 +14,35 @@ def morning_set(Graphs_matrix, hh_occupation=0.9):
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
 
     # turn off school and work layers
-    schl_data_set = 0*schl_data
+    preschl_data_set = 0*preschl_data
+    primary_data_set = 0*primary_data
+    highschl_data_set = 0*highschl_data
     work_data_set = 0*work_data
 
     # turn on portions of households and community
@@ -47,17 +59,11 @@ def morning_set(Graphs_matrix, hh_occupation=0.9):
     comm_data_set = comm_data_select*comm_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
-
-    # load graphs data
-    hh_row,     hh_col,   hh_data = Graphs_matrix[0]
-    schl_row, schl_col, schl_data = Graphs_matrix[1]
-    work_row, work_col, work_data = Graphs_matrix[2]
-    comm_row, comm_col, comm_data = Graphs_matrix[3]
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
 
     cols = np.concatenate(args_cols)
 
@@ -74,17 +80,27 @@ def day_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
@@ -101,11 +117,12 @@ def day_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
     comm_data_set = comm_data_select*comm_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data,work_data,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
+
     cols = np.concatenate(args_cols)
 
     w = [rows.astype(np.int32),cols.astype(np.int32),ps]
@@ -121,23 +138,35 @@ def night_set(Graphs_matrix,hh_occupation=0.7):
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
 
     # turn off school and work layers
-    schl_data_set = 0*schl_data
+    preschl_data_set = 0*preschl_data
+    primary_data_set = 0*primary_data
+    highschl_data_set = 0*highschl_data
     work_data_set = 0*work_data
 
     # turn on portions of households and community
@@ -154,14 +183,16 @@ def night_set(Graphs_matrix,hh_occupation=0.7):
     comm_data_set = comm_data_select*comm_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
+
     cols = np.concatenate(args_cols)
 
     w = [rows.astype(np.int32),cols.astype(np.int32),ps]
+
 
     return w
 
