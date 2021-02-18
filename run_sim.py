@@ -33,7 +33,7 @@ parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--intervention', default=0.6, type=float,
                     help='Intervention efficiancy')
-parser.add_argument('--intervention_type', default='intervention', type=str,
+parser.add_argument('--intervention_type', default='no_intervention', type=str,
                     help='Define the type of intervention [no_intervention,internvention,school_alternancy]')
 parser.add_argument('--work_occupation', default=0.6, type=float,
                     help='Percentage of occupation at workplaces over intervention')
@@ -610,6 +610,14 @@ matrix_highschool_row = np.asarray(np2.asarray(matrix_highschool[0]))
 matrix_highschool_col = np.asarray(np2.asarray(matrix_highschool[1]))
 matrix_highschool_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
+## Work
+matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,age_tracker,df_run_params,args.delta_t)
+
+matrix_work_row = np.asarray(np2.asarray(matrix_work[0]))
+matrix_work_col = np.asarray(np2.asarray(matrix_work[1]))
+matrix_work_data = np.asarray(np2.asarray(matrix_work[2]))
+
+
 ## Community
 matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,np2.arange(0,pop,1),age_group_community,age_tracker,df_run_params,args.delta_t)
 
@@ -618,7 +626,7 @@ matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
 matrix_community_data = np.asarray(np2.asarray(matrix_community[2]))
 
 # Saves graphs
-multilayer_matrix = [matrix_household,matrix_preschool,matrix_primary,matrix_highschool,matrix_community]
+multilayer_matrix = [matrix_household,matrix_preschool,matrix_primary,matrix_highschool,matrix_work,matrix_community]
 
 
 #--------------------------------------------------------------------------------------------------------------------------------------

@@ -51,12 +51,12 @@ def morning_set(Graphs_matrix, hh_occupation=0.9):
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
 
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
@@ -109,12 +109,12 @@ def day_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
     
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
@@ -175,12 +175,12 @@ def night_set(Graphs_matrix,hh_occupation=0.7):
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
 
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
@@ -241,23 +241,35 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
 
     # turn off school and work layers
-    schl_data_set = 0*schl_data
+    preschl_data_set = 0*preschl_data
+    primary_data_set = 0*primary_data
+    highschl_data_set = 0*highschl_data
     work_data_set = 0*work_data
 
     # turn on portions of households and community
@@ -268,25 +280,19 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation_intervention),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
 
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation_intervention),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
-
-    # load graphs data
-    hh_row,     hh_col,   hh_data = Graphs_matrix[0]
-    schl_row, schl_col, schl_data = Graphs_matrix[1]
-    work_row, work_col, work_data = Graphs_matrix[2]
-    comm_row, comm_col, comm_data = Graphs_matrix[3]
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
 
     cols = np.concatenate(args_cols)
 
@@ -303,17 +309,27 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
@@ -326,39 +342,54 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation_intervention),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
 
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation_intervention),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # turn off portions of school and work layers
+    length = int(preschl_data.shape[0]/2)
+    preschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                            shape=(length,)), 2) 
+    preschl_data_set = preschl_data_select.reshape(preschl_data_select.shape[0],1)*preschl_data
+
+    length = int(primary_data.shape[0]/2)
+    primary_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                            shape=(length,)), 2) 
+    primary_data_set = primary_data_select.reshape(primary_data_select.shape[0],1)*primary_data
+
+    length = int(highschl_data.shape[0]/2)
+    highschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                            shape=(length,)), 2) 
+    highschl_data_set = highschl_data_select.reshape(highschl_data_select.shape[0],1)*highschl_data
+
     if schl_occupation == 0:    
-        schl_data_set = 0*schl_data     # if schools are fully closed
+        preschl_data_set = 0*preschl_data
+        primary_data_set = 0*primary_data
+        highschl_data_set = 0*highschl_data
     elif schl_occupation == 1.0:
-        schl_data_set = schl_data
-    else:
-        length = int(schl_data.shape[0]/2)
-        schl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
-                                                shape=(length,)), 2) 
-        schl_data_set = schl_data_select*schl_data
+        preschl_data_set = preschl_data
+        primary_data_set = primary_data
+        highschl_data_set = highschl_data
+
     
     # work_occuption_intervention = 1-intervention_eff
+    length = int(work_data.shape[0]/2)
+    work_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(work_occupation),
+                                            shape=(length,)), 2) 
+    work_data_set = work_data_select.reshape(work_data_select.shape[0],1)*work_data
     if work_occupation == 0:
         work_data_set = 0*work_data     # if work offices are fully closed
-    else:
-        length = int(work_data.shape[0]/2)
-        work_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(work_occupation),
-                                                shape=(length,)), 2) 
-        work_data_set = work_data_select*work_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
+
     cols = np.concatenate(args_cols)
 
     w = [rows.astype(np.int32),cols.astype(np.int32),ps]
@@ -374,23 +405,35 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_school = Graphs_matrix[1]
-    schl_row = np.asarray(np2.asarray(matrix_school[0]))
-    schl_col = np.asarray(np2.asarray(matrix_school[1]))
-    schl_data = np.asarray(np2.asarray(matrix_school[2]))
+    matrix_preschool = Graphs_matrix[1]
+    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
-    matrix_work = Graphs_matrix[2]
+    matrix_primary = Graphs_matrix[2]
+    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+
+    matrix_highschool = Graphs_matrix[3]
+    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
+    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
+    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+
+    matrix_work = Graphs_matrix[4]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
-    matrix_community = Graphs_matrix[3]
+    matrix_community = Graphs_matrix[5]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
 
     # turn off school and work layers
-    schl_data_set = 0*schl_data
+    preschl_data_set = 0*preschl_data
+    primary_data_set = 0*primary_data
+    highschl_data_set = 0*highschl_data
     work_data_set = 0*work_data
 
     # turn on portions of households and community
@@ -401,19 +444,19 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
     length = int(hh_data.shape[0]/2)
     hh_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(hh_occupation_intervention),
                                               shape=(length,)), 2) 
-    hh_data_set = hh_data_select*hh_data
+    hh_data_set = hh_data_select.reshape(hh_data_select.shape[0],1)*hh_data
 
     length = int(comm_data.shape[0]/2)
     comm_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(comm_occupation_intervention),
                                               shape=(length,)), 2) 
-    comm_data_set = comm_data_select*comm_data
+    comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # create conections
-    args_ps = (hh_data_set,schl_data_set,work_data_set,comm_data_set)
+    args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
     ps = np.concatenate(args_ps)
-    args_rows = (hh_row,schl_row,work_row,comm_row)
+    args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
-    args_cols = (hh_col,schl_col,work_col,comm_col)
+    args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
     cols = np.concatenate(args_cols)
 
     w = [rows.astype(np.int32),cols.astype(np.int32),ps]
