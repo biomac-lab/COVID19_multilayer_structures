@@ -312,16 +312,56 @@ elderly_ages_sigma = pd.DataFrame(elderly_ages_params[elderly_ages_params['param
 elderly_params = [elderly_ages_beta,elderly_ages_IFR,elderly_ages_RecPeriod,elderly_ages_alpha,elderly_ages_sigma]
 
 
-young_params_medians = medians_params(young_params,'0-19',last=15)
-youngAdults_params_medians = medians_params(youngAdults_params,'20-39',last=15)
-adults_params_medians = medians_params(adults_params,'40-49',last=15)
-seniorAdults_params_medians = medians_params(seniorAdults_params,'50-59',last=15)
-senior_params_medians = medians_params(senior_params,'60-69',last=15)
-elderly_params_medians = medians_params(elderly_params,'70-90+',last=15)
+young_params_medians = medians_params(young_params,'0-19',last=15)  # Schools
+youngAdults_params_medians = medians_params(youngAdults_params,'20-39',last=15) # Adults
+adults_params_medians = medians_params(adults_params,'40-49',last=15)   # Adults
+seniorAdults_params_medians = medians_params(seniorAdults_params,'50-59',last=15) # Adults
+senior_params_medians = medians_params(senior_params,'60-69',last=15)   # Elders
+elderly_params_medians = medians_params(elderly_params,'70-90+',last=15)    # Elders
 
 
+# Simplify, get medians of values
+params_desc = ['age','beta','IFR','RecPeriod','alpha','sigma']
+
+main_adults_params_values  = ['20-59',
+                              np2.median([youngAdults_params_medians['beta'],adults_params_medians['beta'],seniorAdults_params_medians['beta']]),
+                              np2.median([youngAdults_params_medians['IFR'],adults_params_medians['IFR'],seniorAdults_params_medians['IFR']]),
+                              np2.median([youngAdults_params_medians['RecPeriod'],adults_params_medians['RecPeriod'],seniorAdults_params_medians['RecPeriod']]),
+                              np2.median([youngAdults_params_medians['alpha'],adults_params_medians['alpha'],seniorAdults_params_medians['alpha']]),
+                              np2.median([youngAdults_params_medians['sigma'],adults_params_medians['sigma'],seniorAdults_params_medians['sigma']])]
+main_adults_params_medians = dict(zip(params_desc,main_adults_params_values))
+
+main_elders_params_values  = ['60-90+',
+                              np2.median([senior_params_medians['beta'],elderly_params_medians['beta']]),
+                              np2.median([senior_params_medians['IFR'],elderly_params_medians['IFR']]),
+                              np2.median([senior_params_medians['RecPeriod'],elderly_params_medians['RecPeriod']]),
+                              np2.median([senior_params_medians['alpha'],elderly_params_medians['alpha']]),
+                              np2.median([senior_params_medians['sigma'],elderly_params_medians['sigma']])]
+main_elders_params_medians = dict(zip(params_desc,main_elders_params_values))
 
 
+### Define parameters per layers
+def calculate_R0(IFR,alpha,beta,RecPeriod,sigma):
+    return (1-IFR)*(alpha*beta*RecPeriod+(1-alpha)*beta*sigma*RecPeriod)
+
+def model_params(params_dict,layer):
+    layer_params = {'layer':layer,
+                    'RecPeriod':params_dict['RecPeriod'],
+                    'R0':calculate_R0(params_dict['IFR'],params_dict['alpha'],params_dict['beta'],
+                                      params_dict['RecPeriod'],params_dict['sigma'])}
+    return layer_params
+
+school_params = model_params(young_params_medians,'schools')
+adults_params = model_params(main_adults_params_medians,'adults')
+elders_params = model_params(main_elders_params_medians,'elders')
+
+params_def = ['layer','RecPeriod','R0']
+run_params = [ [school_params['layer'],adults_params['layer'],elders_params['layer']],
+               [school_params['RecPeriod'],adults_params['RecPeriod'],elders_params['RecPeriod']],
+               [school_params['R0'],adults_params['R0'],elders_params['R0']] ]
+run_params = dict(zip(params_def,run_params))
+
+df_run_params = pd.DataFrame.from_dict(run_params)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -425,7 +465,7 @@ n_binom = mean/p
 community_degree = np2.random.binomial(n_binom, p, size = pop)
 
 # No correlation between contacts
-n_community = args.community_n
+n_community = args.community_nelders_params
 r_community = args.community_r
 
 # Split the age group of old population according to the population seen in the data
