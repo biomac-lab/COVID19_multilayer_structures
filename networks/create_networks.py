@@ -46,6 +46,7 @@ def set_infection_prob(edges, ages, df_ages_params, delta_t, calculate_individua
         # Get node params params depending in class
         R0_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'R0']
         duration_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'RecPeriod']
+        # Calculate infection probability
         if deg_n == 1:
             prob_inf = 1e-6
         else:
@@ -91,7 +92,7 @@ def create_fully_connected(dist_groups, ages, indices, df_ages_params, delta_t):
     return w
     
     
-def create_external_corr(pop,pop_subset,degree_dist,n,r,indx_list,correlation_group,R0,duration,delta_t):
+def create_external_corr(pop,pop_subset,degree_dist,n,r,indx_list,correlation_group,ages,df_ages_params,delta_t):
     """ Create correlated external connections for either the whole population or a subset
     @param pop : Total population size
     @type : int
@@ -167,7 +168,7 @@ def create_external_corr(pop,pop_subset,degree_dist,n,r,indx_list,correlation_gr
 
     edges = [rows, cols]
 
-    w = set_infection_prob(edges,R0,duration,delta_t)
+    w = set_infection_prob(edges,ages,df_ages_params,delta_t)
 
     return w
 

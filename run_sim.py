@@ -33,14 +33,15 @@ parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--intervention', default=0.6, type=float,
                     help='Intervention efficiancy')
+parser.add_argument('--intervention_type', default='intervention', type=str,
+                    help='Define the type of intervention [no_intervention,internvention,school_alternancy]')
 parser.add_argument('--work_occupation', default=0.6, type=float,
                     help='Percentage of occupation at workplaces over intervention')
 parser.add_argument('--school_occupation', default=0.35, type=float,
                     help='Percentage of occupation at classrooms over intervention')
 parser.add_argument('--school_openings', default=20, type=int,
                     help='Day of the simulation where schools are open')
-parser.add_argument('--school_alternancy', default=False, type=bool,
-                    help='Percentage of occupation at classrooms over intervention')
+
 
 parser.add_argument('--Tmax', default=180, type=int,
                     help='Length of simulation (days)')
@@ -93,11 +94,6 @@ parser.add_argument('--community_n', default=1, type=float,
                     help='Number of community')
 parser.add_argument('--community_r', default=0, type=float,
                     help='Correlation in community layer')
-
-parser.add_argument('--R0', default=3, type=float,
-                    help='Fixed basic reproduction number') 
-parser.add_argument('--MILDINF_DURATION', default=6, type=int,
-                    help='Duration of mild infection, days')   
                                          
 args = parser.parse_args()
 
@@ -141,8 +137,8 @@ scale_vec=(std_vec**2)/mean_vec # This will contain scale values for each state
 # Define transition probabilities
 
 # Define probability of recovering (as opposed to progressing or dying) from each state
-recovery_probabilities = np.array([0., 0., Fcommunity_ = very_young_ + preschool_ + primary_ + highschool_ + university_ + work_ + elderly_
-community = sum(community_)/total_pop_BOG
+recovery_probabilities = np.array([0., 0., FracMild, FracSevere / (FracSevere + FracCritical), 1. - CFR / FracCritical, 0., 0.])
+
 # Define relative infectivity of each state
 infection_probabilities = np.array([0., 0., 1.0, 0., 0., 0., 0.])
 
@@ -465,7 +461,7 @@ n_binom = mean/p
 community_degree = np2.random.binomial(n_binom, p, size = pop)
 
 # No correlation between contacts
-n_community = args.community_nelders_params
+n_community = args.community_n
 r_community = args.community_r
 
 # Split the age group of old population according to the population seen in the data
@@ -585,7 +581,7 @@ for i in range(working):
 print('Creating graphs...')
 
 ## Households
-matrix_household = create_networks.create_fully_connected(household_sizes,np2.arange(0,pop,1),args.R0,args.MILDINF_DURATION,args.delta_t)
+matrix_household = create_networks.create_fully_connected(household_sizes,age_tracker_all,np2.arange(0,pop,1),df_run_params,args.delta_t)
 
 # Get row, col, data information from the sparse matrices
 # Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
@@ -594,28 +590,28 @@ matrix_household_col = np.asarray(np2.asarray(matrix_household[1]))
 matrix_household_data = np.asarray(np2.asarray(matrix_household[2]))
 
 ## Preschool
-matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
 
 matrix_preschool_row = np.asarray(np2.asarray(matrix_preschool[0]))
 matrix_preschool_col = np.asarray(np2.asarray(matrix_preschool[2]))
 matrix_preschool_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
 ## Primary
-matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
 
 matrix_primary_row = np.asarray(np2.asarray(matrix_primary[0]))
 matrix_primary_col = np.asarray(np2.asarray(matrix_primary[1]))
 matrix_primary_data = np.asarray(np2.asarray(matrix_primary[2]))
 
 ## Highschool
-matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,args.R0,args.MILDINF_DURATION,args.delta_t)
+matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
 
 matrix_highschool_row = np.asarray(np2.asarray(matrix_highschool[0]))
 matrix_highschool_col = np.asarray(np2.asarray(matrix_highschool[1]))
 matrix_highschool_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
 ## Community
-matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,np2.arange(0,pop,1),age_group_community,args.R0,args.MILDINF_DURATION,args.delta_t)
+matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,np2.arange(0,pop,1),age_group_community,age_tracker,df_run_params,args.delta_t)
 
 matrix_community_row = np.asarray(np2.asarray(matrix_community[0]))
 matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
@@ -642,12 +638,174 @@ total_steps = sum(step_intervals)
 import networks.network_dynamics as nd
 
 print('Creating dynamics...')
-if args.school_alternancy:
 
-    time_intervals, ws = nd.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
-                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+if args.intervention_type == 'no_intervention':
+    time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=0,
+                                                            interv_glob=0,schl_occupation=1,work_occupation=1)
 
-else:
-
+elif args.intervention_type == 'intervention':
     time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
                                                             interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+
+elif args.intervention_type == 'school_alternancy':
+    time_intervals, ws = nd.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+else:
+    print('No valid intervention type')
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+#########################################
+############### SIMULATE ################
+
+# Bogota data
+
+cum_cases = 632532
+cum_rec   = 593329
+mild_house = 17595
+hosp_beds = 5369
+ICU_beds  = 1351
+deaths    = 13125
+
+BOG_E  = int( pop * (cum_cases-cum_rec-mild_house-deaths)/total_pop_BOG)
+BOG_R  = int( pop * 0.3 )    # Assuming that 30% of population is already recovered
+BOG_I1 = int( pop * mild_house/total_pop_BOG )
+BOG_I2 = int( pop * hosp_beds/total_pop_BOG )
+BOG_I3 = int( pop * ICU_beds/total_pop_BOG )
+BOG_D  = int( pop * deaths/total_pop_BOG )
+
+
+####################### RUN
+print('Simulating...')
+soln=np.zeros((args.number_trials,total_steps,7))
+soln_cum=np.zeros((args.number_trials,total_steps,7))
+
+for key in tqdm(range(args.number_trials), total=args.number_trials):
+
+  #Initial condition
+  init_ind_E = random.uniform(random.PRNGKey(key), shape=(BOG_E,), maxval=pop).astype(np.int32)
+  init_ind_I1 = random.uniform(random.PRNGKey(key), shape=(BOG_I1,), maxval=pop).astype(np.int32)
+  init_ind_I2 = random.uniform(random.PRNGKey(key), shape=(BOG_I2,), maxval=pop).astype(np.int32)
+  init_ind_I3 = random.uniform(random.PRNGKey(key), shape=(BOG_I3,), maxval=pop).astype(np.int32)
+  init_ind_D = random.uniform(random.PRNGKey(key), shape=(BOG_D,), maxval=pop).astype(np.int32)
+  init_ind_R = random.uniform(random.PRNGKey(key), shape=(BOG_R,), maxval=pop).astype(np.int32)
+  init_state = np.zeros(pop, dtype=np.int32)
+  init_state = index_update(init_state,init_ind_E,np.ones(BOG_E, dtype=np.int32)*1) # E
+  init_state = index_update(init_state,init_ind_I1,np.ones(BOG_I1, dtype=np.int32)*2) # I1
+  init_state = index_update(init_state,init_ind_I2,np.ones(BOG_I2, dtype=np.int32)*3) # I2
+  init_state = index_update(init_state,init_ind_I3,np.ones(BOG_I3, dtype=np.int32)*4) # I3
+  init_state = index_update(init_state,init_ind_D,np.ones(BOG_D, dtype=np.int32)*5) # D
+  init_state = index_update(init_state,init_ind_R,np.ones(BOG_R, dtype=np.int32)*6) # R
+
+
+  _, init_state_timer = state_length_sampler(random.PRNGKey(key), init_state)
+
+  #Run simulation
+  _, state, _, _, total_history = model.simulate_intervals(
+    ws, time_intervals, state_length_sampler, infection_probabilities, 
+    recovery_probabilities, init_state, init_state_timer, key = random.PRNGKey(key), epoch_len=1)
+  
+  history = np.array(total_history)[:, 0, :]  # This unpacks current state counts
+  soln=index_add(soln,index[key,:, :],history)
+
+  cumulative_history = np.array(total_history)[:, 1, :] 
+  soln_cum=index_add(soln_cum,index[key,:, :],cumulative_history)
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
+#########################################
+############## Save Results #############
+
+
+# Confidence intervals
+loCI = 5
+upCI = 95
+soln_avg=np.average(soln,axis=0)
+soln_loCI=np.percentile(soln,loCI,axis=0)
+soln_upCI=np.percentile(soln,upCI,axis=0)
+
+print('Saving results...')
+
+# Save results
+tvec = np.linspace(0,Tmax,total_steps)
+
+df_soln_list = []
+for i in range(args.number_trials):
+  df_results_soln_i = pd.DataFrame(columns=['iter','tvec','S','E','I1','I2','I3','D','R'])
+  df_results_soln_i['iter']  = [i] * len(tvec)
+  df_results_soln_i['tvec']  = list(tvec)
+  df_results_soln_i['S']     = list(soln[i,:,0])
+  df_results_soln_i['E']     = list(soln[i,:,1])
+  df_results_soln_i['I1']    = list(soln[i,:,2])
+  df_results_soln_i['I2']    = list(soln[i,:,3])
+  df_results_soln_i['I3']    = list(soln[i,:,4])
+  df_results_soln_i['D']     = list(soln[i,:,5])
+  df_results_soln_i['R']     = list(soln[i,:,6])
+  df_soln_list.append(df_results_soln_i)
+df_results_soln = pd.concat(df_soln_list)
+
+df_soln_cum_list = []
+for i in range(args.number_trials):
+  df_results_soln_cum_i = pd.DataFrame(columns=['iter','tvec','S','E','I1','I2','I3','D','R'])
+  df_results_soln_cum_i['iter']  = [i] * len(tvec)
+  df_results_soln_cum_i['tvec']  = list(tvec)
+  df_results_soln_cum_i['S']     = list(soln_cum[i,:,0])
+  df_results_soln_cum_i['E']     = list(soln_cum[i,:,1])
+  df_results_soln_cum_i['I1']    = list(soln_cum[i,:,2])
+  df_results_soln_cum_i['I2']    = list(soln_cum[i,:,3])
+  df_results_soln_cum_i['I3']    = list(soln_cum[i,:,4])
+  df_results_soln_cum_i['D']     = list(soln_cum[i,:,5])
+  df_results_soln_cum_i['R']     = list(soln_cum[i,:,6])
+  df_soln_cum_list.append(df_results_soln_cum_i)
+df_results_soln_cum = pd.concat(df_soln_cum_list)
+
+
+df_results_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+df_results_history['tvec']  = list(tvec)
+df_results_history['S']     = list(history[:,0])
+df_results_history['E']     = list(history[:,1])
+df_results_history['I1']    = list(history[:,2])
+df_results_history['I2']    = list(history[:,3])
+df_results_history['I3']    = list(history[:,4])
+df_results_history['D']     = list(history[:,5])
+df_results_history['R']     = list(history[:,6])
+
+df_results_com_history = pd.DataFrame(columns=['tvec','S','E','I1','I2','I3','D','R'])
+df_results_com_history['tvec']  = list(tvec)
+df_results_com_history['S']     = list(cumulative_history[:,0])
+df_results_com_history['E']     = list(cumulative_history[:,1])
+df_results_com_history['I1']    = list(cumulative_history[:,2])
+df_results_com_history['I2']    = list(cumulative_history[:,3])
+df_results_com_history['I3']    = list(cumulative_history[:,4])
+df_results_com_history['D']     = list(cumulative_history[:,5])
+df_results_com_history['R']     = list(cumulative_history[:,6])
+
+
+intervention_save = None
+
+if args.intervention_type == 'no_intervention':
+    intervention_save = 'no_intervention'
+
+elif args.intervention_type == 'intervention':
+    intervention_save = 'intervention'
+
+elif args.intervention_type == 'school_alternancy':
+    intervention_save = 'school_alternancy'
+       
+else:
+    print('No valid intervention type')
+
+
+if not os.path.isdir( os.path.join(results_path, intervention_save, str(number_nodes)) ):
+        os.makedirs(os.path.join(results_path, intervention_save, str(number_nodes)))
+
+path_save = os.path.join(results_path, intervention_save, str(number_nodes))
+
+df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+
+print('Done! \n')
