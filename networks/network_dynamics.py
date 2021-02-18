@@ -60,7 +60,7 @@ def morning_set(Graphs_matrix, hh_occupation=0.9):
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
@@ -118,7 +118,7 @@ def day_set(Graphs_matrix, hh_occupation=0.3, comm_occupation=0.2):
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
@@ -184,7 +184,7 @@ def night_set(Graphs_matrix,hh_occupation=0.7):
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
@@ -289,7 +289,7 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
@@ -350,21 +350,6 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
     comm_data_set = comm_data_select.reshape(comm_data_select.shape[0],1)*comm_data
 
     # turn off portions of school and work layers
-    length = int(preschl_data.shape[0]/2)
-    preschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
-                                            shape=(length,)), 2) 
-    preschl_data_set = preschl_data_select.reshape(preschl_data_select.shape[0],1)*preschl_data
-
-    length = int(primary_data.shape[0]/2)
-    primary_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
-                                            shape=(length,)), 2) 
-    primary_data_set = primary_data_select.reshape(primary_data_select.shape[0],1)*primary_data
-
-    length = int(highschl_data.shape[0]/2)
-    highschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
-                                            shape=(length,)), 2) 
-    highschl_data_set = highschl_data_select.reshape(highschl_data_select.shape[0],1)*highschl_data
-
     if schl_occupation == 0:    
         preschl_data_set = 0*preschl_data
         primary_data_set = 0*primary_data
@@ -373,8 +358,24 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
         preschl_data_set = preschl_data
         primary_data_set = primary_data
         highschl_data_set = highschl_data
+    else:
+        length = int(preschl_data.shape[0]/2)
+        preschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                                shape=(length,)), 2) 
+        preschl_data_set = preschl_data_select.reshape(preschl_data_select.shape[0],1)*preschl_data
 
-    
+        length = int(primary_data.shape[0]/2)
+        primary_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                                shape=(length,)), 2) 
+        primary_data_set = primary_data_select.reshape(primary_data_select.shape[0],1)*primary_data
+
+        length = int(highschl_data.shape[0]/2)
+        highschl_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(schl_occupation),
+                                                shape=(length,)), 2) 
+        highschl_data_set = highschl_data_select.reshape(highschl_data_select.shape[0],1)*highschl_data
+
+
+        
     # work_occuption_intervention = 1-intervention_eff
     length = int(work_data.shape[0]/2)
     work_data_select = np.repeat( random.bernoulli(random.PRNGKey(0),p=(work_occupation),
@@ -385,7 +386,7 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)
@@ -453,7 +454,7 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
 
     # create conections
     args_ps = (hh_data_set,preschl_data_set,primary_data_set,highschl_data_set,work_data_set,comm_data_set)
-    ps = np.concatenate(args_ps)
+    ps = np.concatenate(args_ps); ps = ps.reshape(ps.shape[0],)
     args_rows = (hh_row,preschl_row,primary_row,highschl_row,work_row,comm_row)
     rows = np.concatenate(args_rows)
     args_cols = (hh_col,preschl_col,primary_col,highschl_col,work_col,comm_col)

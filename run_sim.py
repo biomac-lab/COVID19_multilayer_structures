@@ -33,7 +33,7 @@ parser.add_argument('--population', default=1000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--intervention', default=0.6, type=float,
                     help='Intervention efficiancy')
-parser.add_argument('--intervention_type', default='no_intervention', type=str,
+parser.add_argument('--intervention_type', default='intervention', type=str,
                     help='Define the type of intervention [no_intervention,internvention,school_alternancy]')
 parser.add_argument('--work_occupation', default=0.6, type=float,
                     help='Percentage of occupation at workplaces over intervention')
@@ -43,7 +43,7 @@ parser.add_argument('--school_openings', default=20, type=int,
                     help='Day of the simulation where schools are open')
 
 
-parser.add_argument('--Tmax', default=180, type=int,
+parser.add_argument('--Tmax', default=200, type=int,
                     help='Length of simulation (days)')
 parser.add_argument('--delta_t', default=0.08, type=float,
                     help='Time steps')
@@ -649,7 +649,7 @@ print('Creating dynamics...')
 
 if args.intervention_type == 'no_intervention':
     time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=0,
-                                                            interv_glob=0,schl_occupation=1,work_occupation=1)
+                                                            interv_glob=0,schl_occupation=1.0,work_occupation=1.0)
 
 elif args.intervention_type == 'intervention':
     time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
