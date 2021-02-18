@@ -10,8 +10,17 @@ def calculate_individual_degree(rows):
     node_degree = dict(Counter(rows).items()) # Node degree
     return node_degree
 
+def get_age_class(node_age):
+    node_class = None
+    if node_age < 4:
+        node_class = 'schools'
+    elif node_age >= 4 and node_age < 13:
+        node_class = 'adults'
+    else:
+        node_class = 'elders'
+    return node_class
 
-def set_infection_prob(edges, R0, duration, delta_t, calculate_individual_degree=calculate_individual_degree):
+def set_infection_prob(edges, ages, df_ages_params, delta_t, calculate_individual_degree=calculate_individual_degree):
     """ Set individual infection probability depending on the connection of an individiual.
     @param graph : Graph repesenting population struture
     @type : nx undirected graph
@@ -30,11 +39,17 @@ def set_infection_prob(edges, R0, duration, delta_t, calculate_individual_degree
     # Calculate infection probability
     ps = []
     for row_n in rows:
-        deg_n = degrees[row_n]
+        # Get node degree
+        deg_n = degrees[row_n] + 1
+        # Get node age and class
+        age_class_n = get_age_class(ages[row_n])
+        # Get node params params depending in class
+        R0_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'R0']
+        duration_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'RecPeriod']
         if deg_n == 1:
             prob_inf = 1e-6
         else:
-            prob_inf = (R0/((deg_n-1)*duration))*delta_t
+            prob_inf = (R0_n/((deg_n-1)*duration_n))*delta_t
         ps.append(prob_inf)
 
     w = [rows, cols, ps]    # Arrange in list 
@@ -42,7 +57,7 @@ def set_infection_prob(edges, R0, duration, delta_t, calculate_individual_degree
     return w
 
 
-def create_fully_connected(dist_groups, indices, R0, duration, delta_t):
+def create_fully_connected(dist_groups, ages, indices, df_ages_params, delta_t):
     """ Divide the subset of the total population as given by the indices into fully connected groups 
     depending upon their distribution of sizes.
     @param dist_groups : Sizes of the groups in the population
@@ -71,7 +86,7 @@ def create_fully_connected(dist_groups, indices, R0, duration, delta_t):
 
     edges = [rows, cols]
 
-    w = set_infection_prob(edges,R0,duration,delta_t)
+    w = set_infection_prob(edges,ages,df_ages_params,delta_t)
 
     return w
     
