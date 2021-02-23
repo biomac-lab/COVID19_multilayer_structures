@@ -321,7 +321,7 @@ def create_day_intervention_altern_schools_dynamics(Graphs_matrix,Tmax,total_ste
             sim_intervals.extend(days_intervals)
             sim_ws.extend(w_interv_intervals_schl_close)
         else:
-            if days_1 <= altern_period and days_2 == 0:
+            if days_1 < altern_period and days_2 == 0:
                 sim_intervals.extend(days_intervals)
                 sim_ws.extend(w_interv_intervals_schl_open_set1)
                 days_1 += 1
@@ -329,7 +329,7 @@ def create_day_intervention_altern_schools_dynamics(Graphs_matrix,Tmax,total_ste
                 sim_intervals.extend(days_intervals)
                 sim_ws.extend(w_interv_intervals_schl_open_set1)
                 days_2 += 1
-                if days_2 <= altern_period:
+                if days_2 < altern_period:
                     days_1 = 0
                     days_2 = 0
         

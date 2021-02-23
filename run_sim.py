@@ -822,9 +822,9 @@ if not os.path.isdir( os.path.join(results_path, intervention_save, str(number_n
 
 path_save = os.path.join(results_path, intervention_save, str(number_nodes))
 
-df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
-df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
-df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
-df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
+df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
 
 print('Done! \n')
