@@ -42,6 +42,13 @@ parser.add_argument('--school_occupation', default=0.35, type=float,
 parser.add_argument('--school_openings', default=20, type=int,
                     help='Day of the simulation where schools are open')
 
+parser.add_argument('--ventilation_out', default=3, type=float,
+                    help='Ventilation values (h-1) that define how much ventilated is a classroom [2-15]')
+parser.add_argument('--fraction_people_masks', default=1.0, type=float,
+                    help='Fraction value of people wearing masks')
+parser.add_argument('--masks_type', default='N95', type=str,
+                    help='Type of masks that individuals are using. Options are: cloth, surgical, N95')
+
 
 parser.add_argument('--Tmax', default=200, type=int,
                     help='Length of simulation (days)')
@@ -142,6 +149,12 @@ recovery_probabilities = np.array([0., 0., FracMild, FracSevere / (FracSevere + 
 # Define relative infectivity of each state
 infection_probabilities = np.array([0., 0., 1.0, 0., 0., 0., 0.])
 
+# Mask efficiencies in inhalation and exhalation taken from https://tinyurl.com/covid-estimator
+mask_inhalation = {'cloth':0.5 , 'surgical':0.3, 'N95':0.9}
+mask_exhalation = {'cloth':0.5 , 'surgical':0.65, 'N95':0.9}
+
+inhalation_mask = mask_inhalation[args.masks_type]
+exhalation_mask = mask_exhalation[args.masks_type]
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
