@@ -46,7 +46,7 @@ def load_results_int(type_res,path=results_path,n=pop):
     return read_file
 
 def load_results_ints(type_res,n,int_effec,schl_occup,path=results_path):
-    read_path = os.path.join(path,'{}_inter_{}_schoolcap_{}_{}.csv'.format(str(n),str(int_effec),
+    read_path = os.path.join(path,'{}_inter_{}_schoolcap_{}_mask_N95_peopleMasked_1.0_ventilation_3_ID_ND_{}.csv'.format(str(n),str(int_effec),
                                                                            str(schl_occup),type_res))
     read_file = pd.read_csv(read_path)
     return read_file
@@ -65,7 +65,7 @@ intervention_effcs = [0.0,0.2,0.4,0.6] #,1.0]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 interv_color_label = ['k','tab:red','tab:purple','tab:orange']
 
-school_caps        = [1.0] #[0.15,0.25,0.35,0.55,1.0]
+school_caps        = [0.35] #[0.15,0.25,0.35,0.55,1.0]
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 plot_state = 'E'
@@ -111,8 +111,8 @@ for c, cap_ in tqdm(enumerate(school_caps), total=len(school_caps)):
 
     save_path = os.path.join(figures_path,'cases_evolution','{}_lin_{}_dynamics_schoolcap_{}_n_{}.png'.format(plot_state,args.type_sim,cap_,str(pop)))
 
-    plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
-    #plt.show()
+    #plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+    plt.show()
 
 school_caps        = [0.35] #[0.15,0.25,0.35,0.55,1.0]
 plot_state = 'D'
