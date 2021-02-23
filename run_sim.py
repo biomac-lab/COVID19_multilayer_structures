@@ -56,9 +56,9 @@ parser.add_argument('--duration_event', default=6, type=float,
 
 parser.add_argument('--height_room', default=3.1, type=float,
                     help='Schools height of classroom')
-parser.add_argument('--preschool_length_room', default=10.0, type=float,
+parser.add_argument('--preschool_length_room', default=7.0, type=float,
                     help='Preschool length of classroom')
-parser.add_argument('--preschool_width_room', default=10.0, type=float,
+parser.add_argument('--preschool_width_room', default=7.0, type=float,
                     help='Preschool length of classroom')
 parser.add_argument('--primary_length_room', default=10.0, type=float,
                     help='primary length of classroom')
