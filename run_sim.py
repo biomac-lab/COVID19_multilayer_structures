@@ -29,7 +29,10 @@ from networks import create_networks
 import argparse
 parser = argparse.ArgumentParser(description='Simulating interventions')
 
-parser.add_argument('--population', default=1000, type=int,
+parser.add_argument('--res_id', default='ND', type=str,
+                    help='Result ID for simulation save')
+
+parser.add_argument('--population', default=10000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--intervention', default=0.6, type=float,
                     help='Intervention efficiancy')
@@ -614,16 +617,16 @@ print('Creating graphs...')
 matrix_household = create_networks.create_fully_connected(household_sizes,age_tracker_all,np2.arange(0,pop,1),df_run_params,args.delta_t)
 
 ## Preschool
-matrix_preschool = create_networks.set_infection_prob_schools(args.preschool_length_room,args.preschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
-    ,pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_preschool = create_networks.create_external_corr_schools(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t
+    ,args.preschool_length_room,args.preschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
 
 ## Primary
-matrix_primary = create_networks.set_infection_prob_schools(args.primary_length_room,args.primary_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
-    ,pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_primary = create_networks.create_external_corr_schools(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t
+    ,args.primary_length_room,args.primary_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
 
 ## Highschool
-matrix_highschool = create_networks.set_infection_prob_schools(args.highschool_length_room,args.highschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
-    ,pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_highschool = create_networks.create_external_corr_schools(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t
+    ,args.highschool_length_room,args.highschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
 
 ## Work
 matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,age_tracker,df_run_params,args.delta_t)
@@ -819,9 +822,9 @@ if not os.path.isdir( os.path.join(results_path, intervention_save, str(number_n
 
 path_save = os.path.join(results_path, intervention_save, str(number_nodes))
 
-df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
-df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
+df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
+df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),args.res_id), index=False)
 
 print('Done! \n')
