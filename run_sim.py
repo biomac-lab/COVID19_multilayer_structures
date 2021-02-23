@@ -48,6 +48,23 @@ parser.add_argument('--fraction_people_masks', default=1.0, type=float,
                     help='Fraction value of people wearing masks')
 parser.add_argument('--masks_type', default='N95', type=str,
                     help='Type of masks that individuals are using. Options are: cloth, surgical, N95')
+parser.add_argument('--duration_event', default=6, type=float,
+                    help='Duration of event (i.e. classes/lectures) in hours over a day')
+
+parser.add_argument('--height_room', default=3.1, type=float,
+                    help='Schools height of classroom')
+parser.add_argument('--preschool_length_room', default=10.0, type=float,
+                    help='Preschool length of classroom')
+parser.add_argument('--preschool_width_room', default=10.0, type=float,
+                    help='Preschool length of classroom')
+parser.add_argument('--primary_length_room', default=10.0, type=float,
+                    help='primary length of classroom')
+parser.add_argument('--primary_width_room', default=10.0, type=float,
+                    help='primary length of classroom')
+parser.add_argument('--highschool_length_room', default=10.0, type=float,
+                    help='highschool length of classroom')
+parser.add_argument('--highschool_width_room', default=10.0, type=float,
+                    help='highschool length of classroom')
 
 
 parser.add_argument('--Tmax', default=200, type=int,
@@ -597,13 +614,16 @@ print('Creating graphs...')
 matrix_household = create_networks.create_fully_connected(household_sizes,age_tracker_all,np2.arange(0,pop,1),df_run_params,args.delta_t)
 
 ## Preschool
-matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_preschool = create_networks.set_infection_prob_schools(args.preschool_length_room,args.preschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
+    ,pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
 
 ## Primary
-matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_primary = create_networks.set_infection_prob_schools(args.primary_length_room,args.primary_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
+    ,pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
 
 ## Highschool
-matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
+matrix_highschool = create_networks.set_infection_prob_schools(args.highschool_length_room,args.highschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event
+    ,pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
 
 ## Work
 matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,age_tracker,df_run_params,args.delta_t)

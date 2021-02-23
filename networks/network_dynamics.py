@@ -1,8 +1,3 @@
-import sys
-sys.path.append('../')
-
-from models import aerosol_transmission as at
-
 from jax.dtypes import dtype
 import jax.numpy as np
 import numpy as np2
