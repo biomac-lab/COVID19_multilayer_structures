@@ -596,47 +596,20 @@ print('Creating graphs...')
 ## Households
 matrix_household = create_networks.create_fully_connected(household_sizes,age_tracker_all,np2.arange(0,pop,1),df_run_params,args.delta_t)
 
-# Get row, col, data information from the sparse matrices
-# Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
-matrix_household_row = np.asarray(np2.asarray(matrix_household[0]))
-matrix_household_col = np.asarray(np2.asarray(matrix_household[1]))
-matrix_household_data = np.asarray(np2.asarray(matrix_household[2]))
-
 ## Preschool
 matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
-
-matrix_preschool_row = np.asarray(np2.asarray(matrix_preschool[0]))
-matrix_preschool_col = np.asarray(np2.asarray(matrix_preschool[2]))
-matrix_preschool_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
 ## Primary
 matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
 
-matrix_primary_row = np.asarray(np2.asarray(matrix_primary[0]))
-matrix_primary_col = np.asarray(np2.asarray(matrix_primary[1]))
-matrix_primary_data = np.asarray(np2.asarray(matrix_primary[2]))
-
 ## Highschool
 matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
-
-matrix_highschool_row = np.asarray(np2.asarray(matrix_highschool[0]))
-matrix_highschool_col = np.asarray(np2.asarray(matrix_highschool[1]))
-matrix_highschool_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
 ## Work
 matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,age_tracker,df_run_params,args.delta_t)
 
-matrix_work_row = np.asarray(np2.asarray(matrix_work[0]))
-matrix_work_col = np.asarray(np2.asarray(matrix_work[1]))
-matrix_work_data = np.asarray(np2.asarray(matrix_work[2]))
-
-
 ## Community
 matrix_community = create_networks.create_external_corr(pop,pop,community_degree,n_community,r_community,np2.arange(0,pop,1),age_group_community,age_tracker,df_run_params,args.delta_t)
-
-matrix_community_row = np.asarray(np2.asarray(matrix_community[0]))
-matrix_community_col = np.asarray(np2.asarray(matrix_community[1]))
-matrix_community_data = np.asarray(np2.asarray(matrix_community[2]))
 
 # Saves graphs
 multilayer_matrix = [matrix_household,matrix_preschool,matrix_primary,matrix_highschool,matrix_work,matrix_community]
