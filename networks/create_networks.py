@@ -299,7 +299,7 @@ def create_external_corr_schools(pop,pop_subset,degree_dist,n,r,indx_list,correl
 
     edges = [rows, cols]
 
-    w = set_infection_prob(lenght_room,width_room,height_room,ventilation_out,inhalation_mask_eff,
+    w = set_infection_prob_schools(lenght_room,width_room,height_room,ventilation_out,inhalation_mask_eff,
                 exhalation_mask_eff,fraction_people_masks,duration_event_h,edges,ages,df_ages_params,delta_t)
 
     return w
