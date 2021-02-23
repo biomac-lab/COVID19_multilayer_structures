@@ -644,11 +644,13 @@ total_steps = sum(step_intervals)
 
 # Create dynamic
 import networks.network_dynamics as nd
+import networks.network_dynamics_no_interventions as nd_ni
+
 
 print('Creating dynamics...')
 
 if args.intervention_type == 'no_intervention':
-    time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=0,
+    time_intervals, ws = nd_ni.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=0,
                                                             interv_glob=0,schl_occupation=1.0,work_occupation=1.0)
 
 elif args.intervention_type == 'intervention':
