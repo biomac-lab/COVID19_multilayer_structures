@@ -1,5 +1,9 @@
-figures_dir,figures
-results_dir,results
-multilayers_dir,multilayers
-bogota_age_data_dir,data/BogotaAgeStructure.txt
-bogota_houses_data_dir,data/HousesCensusBOG.CSV
+figures_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/figures_new
+results_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/results
+results_old_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/results_old_feb17
+results_test_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/results_test_feb17
+multilayers_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/multilayers
+bogota_age_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/BogotaAgeStructure.txt
+bogota_houses_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/HousesCensusBOG.CSV
+bogota_teachers_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/teachers/teacher_level_distribution_bogota.csv
+bogota_params_ages_data,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/params.csv

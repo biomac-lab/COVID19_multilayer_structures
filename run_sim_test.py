@@ -29,14 +29,11 @@ from networks import create_networks
 import argparse
 parser = argparse.ArgumentParser(description='Simulating interventions')
 
-parser.add_argument('--res_id', default='ND', type=str,
-                    help='Result ID for simulation save')
-
-parser.add_argument('--population', default=1000, type=int,
+parser.add_argument('--population', default=10000, type=int,
                     help='Speficy the number of individials')
-parser.add_argument('--intervention', default=0.6, type=float,
+parser.add_argument('--intervention', default=0.0, type=float,
                     help='Intervention efficiancy')
-parser.add_argument('--intervention_type', default='intervention', type=str,
+parser.add_argument('--intervention_type', default='intervention_community', type=str,
                     help='Define the type of intervention [no_intervention,internvention,school_alternancy]')
 parser.add_argument('--work_occupation', default=0.6, type=float,
                     help='Percentage of occupation at workplaces over intervention')
@@ -45,29 +42,6 @@ parser.add_argument('--school_occupation', default=0.35, type=float,
 parser.add_argument('--school_openings', default=20, type=int,
                     help='Day of the simulation where schools are open')
 
-parser.add_argument('--ventilation_out', default=3, type=float,
-                    help='Ventilation values (h-1) that define how much ventilated is a classroom [2-15]')
-parser.add_argument('--fraction_people_masks', default=1.0, type=float,
-                    help='Fraction value of people wearing masks')
-parser.add_argument('--masks_type', default='N95', type=str,
-                    help='Type of masks that individuals are using. Options are: cloth, surgical, N95')
-parser.add_argument('--duration_event', default=6, type=float,
-                    help='Duration of event (i.e. classes/lectures) in hours over a day')
-
-parser.add_argument('--height_room', default=3.1, type=float,
-                    help='Schools height of classroom')
-parser.add_argument('--preschool_length_room', default=7.0, type=float,
-                    help='Preschool length of classroom')
-parser.add_argument('--preschool_width_room', default=7.0, type=float,
-                    help='Preschool length of classroom')
-parser.add_argument('--primary_length_room', default=10.0, type=float,
-                    help='primary length of classroom')
-parser.add_argument('--primary_width_room', default=10.0, type=float,
-                    help='primary length of classroom')
-parser.add_argument('--highschool_length_room', default=10.0, type=float,
-                    help='highschool length of classroom')
-parser.add_argument('--highschool_width_room', default=10.0, type=float,
-                    help='highschool length of classroom')
 
 parser.add_argument('--Tmax', default=200, type=int,
                     help='Length of simulation (days)')
@@ -168,12 +142,6 @@ recovery_probabilities = np.array([0., 0., FracMild, FracSevere / (FracSevere + 
 # Define relative infectivity of each state
 infection_probabilities = np.array([0., 0., 1.0, 0., 0., 0., 0.])
 
-# Mask efficiencies in inhalation and exhalation taken from https://tinyurl.com/covid-estimator
-mask_inhalation = {'cloth':0.5 , 'surgical':0.3, 'N95':0.95}
-mask_exhalation = {'cloth':0.5 , 'surgical':0.65, 'N95':0.95}
-
-inhalation_mask = mask_inhalation[args.masks_type]
-exhalation_mask = mask_exhalation[args.masks_type]
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
@@ -379,16 +347,7 @@ def model_params(params_dict,layer):
                                       params_dict['RecPeriod'],params_dict['sigma'])}
     return layer_params
 
-def model_params_school(params_dict,layer):
-    from models import aerosol_transmission as at
-    prob_aerosols = at.infection_probability(10,10,3.1,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
-    layer_params = {'layer':layer,
-                    'RecPeriod':params_dict['RecPeriod'],
-                    'R0':calculate_R0(params_dict['IFR'],params_dict['alpha'],params_dict['beta']*prob_aerosols,
-                                      params_dict['RecPeriod'],params_dict['sigma'])}
-    return layer_params
-
-school_params = model_params_school(young_params_medians,'schools')
+school_params = model_params(young_params_medians,'schools')
 adults_params = model_params(main_adults_params_medians,'adults')
 elders_params = model_params(main_elders_params_medians,'elders')
 
@@ -624,20 +583,21 @@ print('Creating graphs...')
 ## Households
 matrix_household = create_networks.create_fully_connected(household_sizes,age_tracker_all,np2.arange(0,pop,1),df_run_params,args.delta_t)
 
+# Get row, col, data information from the sparse matrices
+# Converting into DeviceArrays to run faster with jax. Not sure why the lists have to be first converted to usual numpy arrays though
+
 ## Preschool
 matrix_preschool = create_networks.create_external_corr(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t)
-# matrix_preschool = create_networks.create_external_corr_schools(pop,preschool_going,preschool_degree,n_preschool,r_preschool,preschool_indx,preschool_clroom,age_tracker,df_run_params,args.delta_t
-#     ,args.preschool_length_room,args.preschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
 
 ## Primary
 matrix_primary = create_networks.create_external_corr(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t)
-# matrix_primary = create_networks.create_external_corr_schools(pop,primary_going,primary_degree,n_primary,r_primary,primary_indx,primary_clroom,age_tracker,df_run_params,args.delta_t
-#     ,args.primary_length_room,args.primary_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
+
+matrix_primary_row = np.asarray(np2.asarray(matrix_primary[0]))
+matrix_primary_col = np.asarray(np2.asarray(matrix_primary[1]))
+matrix_primary_data = np.asarray(np2.asarray(matrix_primary[2]))
 
 ## Highschool
 matrix_highschool = create_networks.create_external_corr(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t)
-# matrix_highschool = create_networks.create_external_corr_schools(pop,highschool_going,highschool_degree,n_highschool,r_highschool,highschool_indx,highschool_clroom,age_tracker,df_run_params,args.delta_t
-#     ,args.highschool_length_room,args.highschool_width_room,args.height_room,args.ventilation_out,inhalation_mask,exhalation_mask,args.fraction_people_masks,args.duration_event)
 
 ## Work
 matrix_work = create_networks.create_external_corr(pop,working,work_degree,n_work,r_work,work_indx,job_place,age_tracker,df_run_params,args.delta_t)
@@ -663,23 +623,24 @@ step_intervals = [int(x/delta_t) for x in days_intervals]
 total_steps = sum(step_intervals)
 
 # Create dynamic
-import networks.network_dynamics_old as nd
-import networks.network_dynamics_no_interventions as nd_ni
-
+import networks.network_dynamics_test_work as nd_work
+import networks.network_dynamics_test_comm as nd_comm
+import networks.network_dynamics_test_all as nd_all
 
 print('Creating dynamics...')
 
-if args.intervention_type == 'no_intervention':
-    time_intervals, ws = nd_ni.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=0,
-                                                            interv_glob=0,schl_occupation=1.0,work_occupation=1.0)
-
-elif args.intervention_type == 'intervention':
-    time_intervals, ws = nd.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+if args.intervention_type == 'intervention_work':
+    time_intervals, ws = nd_work.create_day_intervention_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
                                                             interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
 
-elif args.intervention_type == 'school_alternancy':
-    time_intervals, ws = nd.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+elif args.intervention_type == 'intervention_community':
+    time_intervals, ws = nd_comm.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
                                                             interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+
+elif args.intervention_type == 'intervention_all':
+    time_intervals, ws = nd_all.create_day_intervention_altern_schools_dynamics(multilayer_matrix,Tmax=Tmax,total_steps=total_steps,schools_day_open=args.school_openings,
+                                                            interv_glob=args.intervention,schl_occupation=args.school_occupation,work_occupation=args.work_occupation)
+
 else:
     print('No valid intervention type')
 
@@ -813,29 +774,23 @@ df_results_com_history['D']     = list(cumulative_history[:,5])
 df_results_com_history['R']     = list(cumulative_history[:,6])
 
 
-intervention_save = None
 
-if args.intervention_type == 'no_intervention':
-    intervention_save = 'no_intervention'
+if not os.path.isdir( os.path.join(results_path, str(number_nodes)) ):
+        os.makedirs(os.path.join(results_path, str(number_nodes)))
 
-elif args.intervention_type == 'intervention':
-    intervention_save = 'intervention'
+path_save = os.path.join(results_path, str(number_nodes))
 
-elif args.intervention_type == 'school_alternancy':
-    intervention_save = 'school_alternancy'
-       
-else:
-    print('No valid intervention type')
+layer_inter = None
+if args.intervention_type == 'intervention_work':
+    layer_inter = 'work'
+elif args.intervention_type == 'intervention_community':
+    layer_inter = 'community'
+elif args.intervention_type == 'intervention_all':
+    layer_inter = 'all'
 
-
-if not os.path.isdir( os.path.join(results_path, intervention_save, str(number_nodes)) ):
-        os.makedirs(os.path.join(results_path, intervention_save, str(number_nodes)))
-
-path_save = os.path.join(results_path, intervention_save, str(number_nodes))
-
-df_results_soln.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
-df_results_soln_cum.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_soln_cum.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
-df_results_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
-df_results_com_history.to_csv(path_save+'/{}_inter_{}_schoolcap_{}_mask_{}_peopleMasked_{}_ventilation_{}_ID_{}_com_history.csv'.format(str(number_nodes),str(args.intervention),str(args.school_occupation),args.masks_type,str(args.fraction_people_masks),str(args.ventilation_out),args.res_id), index=False)
+df_results_soln.to_csv(path_save+'/{}_layerInt_{}_inter_{}_schoolcap_{}_soln.csv'.format(str(number_nodes),str(layer_inter),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_soln_cum.to_csv(path_save+'/{}_layerInt_{}_inter_{}_schoolcap_{}_soln_cum.csv'.format(str(number_nodes),str(layer_inter),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_history.to_csv(path_save+'/{}_layerInt_{}_inter_{}_schoolcap_{}_history.csv'.format(str(number_nodes),str(layer_inter),str(args.intervention),str(args.school_occupation)), index=False)
+df_results_com_history.to_csv(path_save+'/{}_layerInt_{}_inter_{}_schoolcap_{}_com_history.csv'.format(str(number_nodes),str(layer_inter),str(args.intervention),str(args.school_occupation)), index=False)
 
 print('Done! \n')
