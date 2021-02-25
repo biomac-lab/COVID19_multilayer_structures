@@ -23,7 +23,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Dynamics visualization.')
 
-parser.add_argument('--population', default=5000, type=int,
+parser.add_argument('--population', default=10000, type=int,
                     help='Speficy the number of individials')
 parser.add_argument('--type_sim', default='intervention', type=str,
                     help='Speficy the type of simulation to plot')
@@ -56,7 +56,7 @@ intervention_effcs = [0.0,0.2,0.4] #,0.6]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency'] #,r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 interv_color_label = ['k','tab:red','tab:purple'] #,'tab:orange']
 
-school_caps = [0.35]
+school_caps = [1.0]
 
 masks = ['cloth','surgical','N95']
 
@@ -122,8 +122,8 @@ for mask_ in masks:
             plt.gca().set_prop_cycle(None)
             plt.fill_between(res_median['tvec'],res_loCI[plot_state]*pop,res_upCI[plot_state]*pop,color=interv_color_label[i],alpha=0.3)
             plt.axvspan(0,20,color='gray',alpha=0.05)
-            plt.annotate('Schools \n closed',(0,500),size=9)
-            plt.annotate('Schools \n open',(22,500),size=9)
+            plt.annotate('Schools \n closed',(0,150),size=9)
+            plt.annotate('Schools \n open',(22,150),size=9)
             plt.xlim([0,max(res_median['tvec'])])
             plt.ylim([0,0.02*pop])
             plt.xticks(size=12)
@@ -216,8 +216,8 @@ for mask_ in masks:
             plt.gca().set_prop_cycle(None)
             plt.fill_between(res_median['tvec'],res_loCI[plot_state]*pop,res_upCI[plot_state]*pop,color=interv_color_label[i],alpha=0.3)
             plt.axvspan(0,20,color='gray',alpha=0.05)
-            plt.annotate('Schools \n closed',(0,500),size=9)
-            plt.annotate('Schools \n open',(22,500),size=9)
+            plt.annotate('Schools \n closed',(0,150),size=9)
+            plt.annotate('Schools \n open',(22,150),size=9)
             plt.xlim([0,max(res_median['tvec'])])
             plt.ylim([0,0.02*pop])
             plt.xticks(size=12)
@@ -244,95 +244,94 @@ for mask_ in masks:
 
 # End infections plotting ventilation and mask
 
-intervention_effcs = 0.0 #,0.2,0.4] #,0.6]
+intervention_effcs = [0.0,0.2,0.4] #,0.6]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency'] #,r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 
 school_cap = 0.35
 
 fraction_people_masked = 1.0
 
-ventilation_vals = [0,5,8,15]
+ventilation_vals = [0.0,5.0,8.0,15.0]
+ventilation_labels = ['Cero','Low','Medium','High']
+ventilation_labels = dict(zip(ventilation_vals,ventilation_labels))
 
 masks = ['cloth','surgical','N95']
+masks_labels = {'cloth':'Cloth','surgical':'Surgical','N95':'N95'}
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
 
+inter_ = intervention_effcs[2]
 for m, mask_ in enumerate(masks):
     for j, vent_ in enumerate(ventilation_vals):
 
-        res_read = load_results_ints('soln_cum',args.population,intervention_effcs,school_cap,mask_,fraction_people_masked,ventilation_val,path=results_path)
+        res_read = load_results_ints('soln_cum',args.population,inter_,school_cap,mask_,fraction_people_masked,vent_,path=results_path)
 
         for itr_ in range(10):
             res_read_i = res_read['iter'] == itr_
             res_read_i = pd.DataFrame(res_read[res_read_i])
             end_cases = res_read_i['E'].iloc[-1]
 
-            df_res_i = pd.DataFrame(columns=['iter','mask','interven_eff','ventilation','end_cases'])
+            df_res_i = pd.DataFrame(columns=['iter','Mask','interven_eff','ventilation','end_cases'])
             df_res_i['iter']         = [int(itr_)]
-            df_res_i['mask']         = str(mask_)
-            df_res_i['interven_eff'] = r'{}$\%$'.format(int(intervention_effcs*100))
-            df_res_i['ventilation']   = int(vent_)
+            df_res_i['Mask']         = str(masks_labels[mask_])
+            df_res_i['interven_eff'] = r'{}%'.format(int(inter_*100))
+            df_res_i['ventilation']   = ventilation_labels[vent_]
             df_res_i['end_cases']      = end_cases*pop
             df_list.append(df_res_i)
 
 df_final_E = pd.concat(df_list)
 
-
-fig,ax = plt.subplots(1,1,figsize=(7, 6))
-sns.catplot(ax=ax, data=df_final_E, x='ventilation', y='end_cases', hue='mask',alpha=0.5)
-ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
-plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
-ax.set_xlabel('Ventilation (h-1)',fontsize=17)
-ax.set_ylabel(r'Infections per 10,000',fontsize=17)
-ax.set_title(r'Total infections with schools at {}$\%$'.format(str(school_cap*100)),fontsize=17)
-plt.xticks(size=17)
-plt.yticks(size=17)
-
-save_path = os.path.join(figures_path,'bar_plots','totalInfections_n_{}_schoolcap_{}_.png'.format(str(pop),str(0.35)))
-plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+plt.figure(figsize=(7,6))
+sns.catplot(data=df_final_E, x='ventilation', y='end_cases', hue='Mask',kind='bar',palette='plasma',alpha=0.8)
+#ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
+#plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+plt.xlabel('Ventilation',fontsize=17)
+plt.ylabel(r'Infections per 10,000',fontsize=17)
+plt.title(r'Total infections | schools {}$\%$, intervention {}$\%$'.format(str(int(school_cap*100)),str(int(inter_*100))),fontsize=17)
+plt.xticks(size=16)
+plt.yticks(size=16)
+plt.ylim([0,6100])
+#plt.show()
+save_path = os.path.join(figures_path,'bar_plots','totalInfections_n_{}_inter_{}_schoolcap_{}_.png'.format(str(pop),str(inter_),str(0.35)))
+plt.savefig(save_path,dpi=400, transparent=False, bbox_inches='tight', pad_inches=0.1 )
 
 # End deaths plotting ventilation and mask
 
+inter_ = intervention_effcs[2]
 for m, mask_ in enumerate(masks):
     for j, vent_ in enumerate(ventilation_vals):
 
-        vent_label = None
-        if vent_ == 0:
-            vent_label = 'Low ventilation'
-        elif vent_ == 15:
-            vent_label = 'High ventilation'
-
-        res_read = load_results_ints('soln_cum',args.population,inter_,school_cap,mask_,fraction_people_masked,ventilation_val,path=results_path)
+        res_read = load_results_ints('soln_cum',args.population,inter_,school_cap,mask_,fraction_people_masked,vent_,path=results_path)
 
         for itr_ in range(10):
             res_read_i = res_read['iter'] == itr_
             res_read_i = pd.DataFrame(res_read[res_read_i])
             end_dead = res_read_i['D'].iloc[-1]
 
-            df_res_i = pd.DataFrame(columns=['iter','mask','interven_eff','ventilation','end_dead'])
+            df_res_i = pd.DataFrame(columns=['iter','Mask','interven_eff','ventilation','end_dead'])
             df_res_i['iter']         = [int(itr_)]
-            df_res_i['mask']         = str(mask_)
-            df_res_i['interven_eff'] = r'{}$\%$'.format(int(inter_*100))
-            df_res_i['ventilation']   = int(vent_)
+            df_res_i['Mask']         = str(masks_labels[mask_])
+            df_res_i['interven_eff'] = r'{}%'.format(int(inter_*100))
+            df_res_i['ventilation']   = ventilation_labels[vent_]
             df_res_i['end_dead']      = end_dead*pop
             df_list.append(df_res_i)
 
 df_final_D = pd.concat(df_list)
 
-
-fig,ax = plt.subplots(1,1,figsize=(7, 6))
-sns.catplot(ax=ax, data=df_final_D, x='ventilation', y='end_dead', hue='mask',alpha=0.5)
-ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
-plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
-ax.set_xlabel('Ventilation (h-1)',fontsize=17)
-ax.set_ylabel(r'Deaths per 10,000',fontsize=17)
-ax.set_title(r'Total deaths with schools at {}$\%$'.format(str(school_cap*100)),fontsize=17)
-plt.xticks(size=17)
-plt.yticks(size=17)
-
-save_path = os.path.join(figures_path,'bar_plots','totalDeaths_n_{}_schoolcap_{}_.png'.format(str(pop),str(0.35)))
-plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+plt.figure(figsize=(7,6))
+sns.catplot(data=df_final_D, x='ventilation', y='end_dead', hue='Mask',kind='bar',palette='plasma',alpha=0.8)
+#ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
+#plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
+plt.xlabel('Ventilation',fontsize=17)
+plt.ylabel(r'Deaths per 10,000',fontsize=17)
+plt.title(r'Total deaths | schools {}$\%$, intervention {}$\%$'.format(str(int(school_cap*100)),str(int(inter_*100))),fontsize=17)
+plt.xticks(size=16)
+plt.yticks(size=16)
+plt.ylim([0,125])
+#plt.show()
+save_path = os.path.join(figures_path,'bar_plots','totalDeaths_n_{}_inter_{}_schoolcap_{}_.png'.format(str(pop),str(inter_),str(0.35)))
+plt.savefig(save_path,dpi=400, transparent=False, bbox_inches='tight', pad_inches=0.1 )
 
 ###------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -340,25 +339,29 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 
 # End infections plotting ventilation and adherency
 
-intervention_effcs = 0.0 #,0.2,0.4] #,0.6]
+intervention_effcs = [0.0,0.2,0.4] #,0.6]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency'] #,r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
 
 school_cap = 0.35
 
 fraction_people_masked = [0.5,0.65,0.8,0.95,1.0]
 
-ventilation_vals = [0]
+ventilation_vals = [0.0]
 
 masks = ['cloth','surgical','N95']
+masks_labels = ['Cloth','Surgical','N95']
+masks_labels = dict(zip(masks,masks_labels))
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
+
+inter_ = intervention_effcs[2]
 
 for m, mask_ in enumerate(masks):
     for i, frac_mask_ in enumerate(fraction_people_masked):
         for j, vent_ in enumerate(ventilation_vals):
 
-            res_read = load_results_ints('soln_cum',args.population,intervention_effcs,school_cap,mask_,frac_mask_,ventilation_val,path=results_path)
+            res_read = load_results_ints('soln_cum',args.population,inter_,school_cap,mask_,frac_mask_,vent_,path=results_path)
 
             for itr_ in range(10):
                 res_read_i = res_read['iter'] == itr_
@@ -367,39 +370,47 @@ for m, mask_ in enumerate(masks):
 
                 df_res_i = pd.DataFrame(columns=['iter','mask','frac_mask','interven_eff','ventilation','end_cases'])
                 df_res_i['iter']         = [int(itr_)]
-                df_res_i['mask']         = str(mask_)
-                df_res_i['frac_mask']    = r'{}$\%$'.format(int(frac_mask_*100))
-                df_res_i['interven_eff'] = r'{}$\%$'.format(int(intervention_effcs*100))
+                df_res_i['mask']         = masks_labels[mask_]
+                df_res_i['frac_mask']    = r'{}%'.format(int(frac_mask_*100))
+                df_res_i['interven_eff'] = r'{}%'.format(int(inter_*100))
                 df_res_i['ventilation']   = str(vent_)
                 df_res_i['end_cases']      = end_cases*pop
                 df_list.append(df_res_i)
 
 df_final_E_v = pd.concat(df_list)
-sns.pointplot(ax=ax, data=df_final_E_v, x='end_cases', y='frac_mask', hue='mask', linestyles='',palette='jet',alpha=0.5)
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_final_E_v, x='end_cases', y='frac_mask', hue='mask', linestyles='',dodge=0.3,palette='plasma',alpha=0.8)
 ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'Infections per 10,000',fontsize=17)
-ax.set_ylabel(r'Individuals wearing masks ($\&$)',fontsize=17)
-ax.set_title(r'Total infections with schools at {}$\%$ and low ventilation'.format(str(school_cap*100)),fontsize=17)
-plt.xticks(size=17)
-plt.yticks(size=17)
+ax.set_ylabel(r'Individuals wearing masks ($\%$)',fontsize=17)
+ax.set_title(r'Total infections | schools at {}$\%$, low ventilation'.format(str(school_cap*100)),fontsize=17)
+plt.xticks(size=16)
+plt.yticks(size=16)
+#plt.xlim([4850,6000])
 
-save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}_schoolcap_{}_ventilation_{}.png'.format(str(pop),str(0.35),str(ventilation_vals[0])))
-plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}_schoolcap_{}_ventilation_{}_inter_{}.png'.format(str(pop),str(0.35),str(ventilation_vals[0]),str(inter_)))
+plt.savefig(save_path,dpi=400, transparent=False, bbox_inches='tight', pad_inches=0.1 )
 
 
-ventilation_vals = [15]
+ventilation_vals = [15.0]
+
+fraction_people_masked = [0.5,0.65,0.8,0.95,1.0]
 
 masks = ['cloth','surgical','N95']
+masks_labels = ['Cloth','Surgical','N95']
+masks_labels = dict(zip(masks,masks_labels))
 
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
+
+inter_ = intervention_effcs[2]
 
 for m, mask_ in enumerate(masks):
     for i, frac_mask_ in enumerate(fraction_people_masked):
         for j, vent_ in enumerate(ventilation_vals):
 
-            res_read = load_results_ints('soln_cum',args.population,intervention_effcs,school_cap,mask_,frac_mask_,ventilation_val,path=results_path)
+            res_read = load_results_ints('soln_cum',args.population,inter_,school_cap,mask_,frac_mask_,vent_,path=results_path)
 
             for itr_ in range(10):
                 res_read_i = res_read['iter'] == itr_
@@ -408,22 +419,24 @@ for m, mask_ in enumerate(masks):
 
                 df_res_i = pd.DataFrame(columns=['iter','mask','frac_mask','interven_eff','ventilation','end_cases'])
                 df_res_i['iter']         = [int(itr_)]
-                df_res_i['mask']         = str(mask_)
-                df_res_i['frac_mask']    = r'{}$\%$'.format(int(frac_mask_*100))
-                df_res_i['interven_eff'] = r'{}$\%$'.format(int(intervention_effcs*100))
+                df_res_i['mask']         = masks_labels[mask_]
+                df_res_i['frac_mask']    = r'{}%'.format(int(frac_mask_*100))
+                df_res_i['interven_eff'] = r'{}%'.format(int(inter_*100))
                 df_res_i['ventilation']   = str(vent_)
                 df_res_i['end_cases']      = end_cases*pop
                 df_list.append(df_res_i)
 
 df_final_E_v = pd.concat(df_list)
-sns.pointplot(ax=ax, data=df_final_E_v, x='end_cases', y='frac_mask', hue='mask', linestyles='',palette='jet',alpha=0.5)
+fig,ax = plt.subplots(1,1,figsize=(7, 6))
+sns.pointplot(ax=ax, data=df_final_E_v, x='end_cases', y='frac_mask', hue='mask', linestyles='',dodge=0.2,palette='plasma',alpha=0.8)
 ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
 ax.set_xlabel(r'Infections per 10,000',fontsize=17)
-ax.set_ylabel(r'Individuals wearing masks ($\&$)',fontsize=17)
-ax.set_title(r'Total infections with schools at {}$\%$ and high ventilation'.format(str(school_cap*100)),fontsize=17)
-plt.xticks(size=17)
-plt.yticks(size=17)
+ax.set_ylabel(r'Individuals wearing masks ($\%$)',fontsize=17)
+ax.set_title(r'Total infections | schools at {}$\%$, high ventilation'.format(str(school_cap*100)),fontsize=17)
+plt.xticks(size=16)
+plt.yticks(size=16)
 
-save_path = os.path.join(figures_path,'point_plots','totalDeaths_n_{}_schoolcap_{}_ventilation_{}.png'.format(str(pop),str(0.35),str(ventilation_vals[0])))
-plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
+
+save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}_schoolcap_{}_ventilation_{}_inter_{}.png'.format(str(pop),str(0.35),str(ventilation_vals[0]),str(inter_)))
+plt.savefig(save_path,dpi=400, transparent=False, bbox_inches='tight', pad_inches=0.1 )
