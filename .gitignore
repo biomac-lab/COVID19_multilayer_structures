@@ -1,3 +1,6 @@
+results_not_corrected/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

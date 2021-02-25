@@ -63,7 +63,43 @@ def set_infection_prob(edges, ages, df_ages_params, delta_t, calculate_individua
 
     return w
 
+# def set_infection_prob_schools(lenght_room,width_room,height_room,ventilation_out,inhalation_mask_eff,exhalation_mask_eff,
+#         fraction_people_masks,duration_event_h,edges, ages, df_ages_params, delta_t, calculate_individual_degree=calculate_individual_degree):
+#     """ Set individual infection probability depending on the connection of an individiual.
+#     @param graph : Graph repesenting population struture
+#     @type : nx undirected graph
+#     @param R0 :  Basic reproductive number set for all the system
+#     @type : float
+#     @param duration : Duration of infectious period (days)
+#     @type : int 
+#     @param delta_t : Time stamp
+#     @type : float
+#     @return : Adjacency matrix in sparse format [rows, cols, data]
+#     @type : list of lists
+#     """
+#     rows = edges[0]
+#     cols = edges[1]
+#     degrees = calculate_individual_degree(rows)
+#     # Calculate infection probability
+#     ps = []
+#     for row_n in rows:
+#         # Get node degree
+#         deg_n = degrees[row_n] + 1
+#         # Get node age and class
+#         age_class_n = get_age_class(ages[row_n])
+#         # Get node params params depending in class
+#         R0_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'R0']
+#         duration_n = df_ages_params.loc[df_ages_params['layer']==age_class_n,'RecPeriod']
+#         # Calculate infection probability
+#         if deg_n == 1:
+#             prob_inf = 1e-6
+#         else:
+#             prob_inf = (R0_n/((deg_n-1)*duration_n))*delta_t
+#         ps.append(prob_inf)
 
+#     w = [rows, cols, ps]    # Arrange in list 
+
+#     return w
 
 def set_infection_prob_schools(lenght_room,width_room,height_room,ventilation_out,inhalation_mask_eff,exhalation_mask_eff,
         fraction_people_masks,duration_event_h,edges, ages, df_ages_params, delta_t, calculate_individual_degree=calculate_individual_degree):
@@ -97,9 +133,9 @@ def set_infection_prob_schools(lenght_room,width_room,height_room,ventilation_ou
                                     exhalation_mask_eff,fraction_people_masks,duration_event_h)
         # Calculate infection probability
         if deg_n == 1:
-            prob_inf = 1e-6 * aerosol_prob
+            prob_inf = 1e-6 * 1
         else:
-            prob_inf = ((R0_n/((deg_n-1)*duration_n))*delta_t) * aerosol_prob
+            prob_inf = (R0_n/((deg_n-1)*duration_n)) * aerosol_prob * delta_t * 100
         ps.append(prob_inf)
 
     w = [rows, cols, ps]    # Arrange in list 

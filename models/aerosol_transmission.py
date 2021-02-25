@@ -45,7 +45,7 @@ def avg_quanta_concentration(lenght_room,width_room,height_room,ventilation_out,
     room_volume = lenght_room*width_room*height_room     # m3
     TOTAL_FO_LOSS_RATE = ventilation_out+DACAY_RATE_VIRUS+DEPOSITION_SURFACES+ADDITIONAL_CONTROLS
     net_emmision_rate_val = net_emmision_rate(exhalation_mask_eff,fraction_people_masks)
-    return net_emmision_rate_val/TOTAL_FO_LOSS_RATE/room_volume*(1-(1/TOTAL_FO_LOSS_RATE/duration_event_h)*(1-np2.exp(-TOTAL_FO_LOSS_RATE*duration_event_h)))
+    return (net_emmision_rate_val/TOTAL_FO_LOSS_RATE/room_volume)*(1-(1/TOTAL_FO_LOSS_RATE/duration_event_h)*(1-np2.exp(-TOTAL_FO_LOSS_RATE*duration_event_h)))
 
 
 def quanta_inhaled_per_person(lenght_room,width_room,height_room,ventilation_out,
