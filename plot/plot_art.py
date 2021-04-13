@@ -544,7 +544,7 @@ ventilation_labels = dict(zip(ventilation_vals,ventilation_labels_))
 
 fraction_people_masked = 0.8
 
-mask = 'N95'
+mask = 'surgical'
 
 # cases
 df_list = []
@@ -629,8 +629,6 @@ ventilation_labels_ = ['Cero','Low','Medium','High']
 ventilation_labels = dict(zip(ventilation_vals,ventilation_labels_))
 
 fraction_people_masked = 0.8
-
-mask = 'cloth'
 
 # cases
 df_list = []
