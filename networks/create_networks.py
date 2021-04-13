@@ -137,7 +137,6 @@ def set_infection_prob_schools(lenght_room,width_room,height_room,ventilation_ou
         else:
             prob_inf = (R0_n/((deg_n-1)*duration_n)) * aerosol_prob * delta_t * 100
         ps.append(prob_inf)
-
     w = [rows, cols, ps]    # Arrange in list 
 
     return w
