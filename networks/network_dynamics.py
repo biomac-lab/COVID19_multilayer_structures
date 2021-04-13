@@ -10,31 +10,37 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
 
     # load networks
     matrix_household = Graphs_matrix[0]
+    # matrix_household[2] = [val.values[0] for val in matrix_household[2]]
     hh_row = np.asarray(np2.asarray(matrix_household[0]))
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
     matrix_preschool = Graphs_matrix[1]
+    # matrix_preschool[2] = [val.values[0] for val in matrix_preschool[2]]
     preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
     preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
     preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
     matrix_primary = Graphs_matrix[2]
+    # matrix_primary[2] = [val.values[0] for val in matrix_primary[2]]
     primary_row = np.asarray(np2.asarray(matrix_primary[0]))
     primary_col = np.asarray(np2.asarray(matrix_primary[1]))
     primary_data = np.asarray(np2.asarray(matrix_primary[2]))
 
     matrix_highschool = Graphs_matrix[3]
+    # matrix_highschool[2] = [val.values[0] for val in matrix_highschool[2]]
     highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
     highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
     highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
     matrix_work = Graphs_matrix[4]
+    # matrix_work[2] = [val.values[0] for val in matrix_work[2]]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
     matrix_community = Graphs_matrix[5]
+    # matrix_community[2] = [val.values[0] for val in matrix_community[2]]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
@@ -78,31 +84,37 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
                          schl_altern=False, hh_occupation=0.3, comm_occupation=0.2):
     # load networks
     matrix_household = Graphs_matrix[0]
+    # matrix_household[2] = [val.values[0] for val in matrix_household[2]]
     hh_row = np.asarray(np2.asarray(matrix_household[0]))
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
     matrix_preschool = Graphs_matrix[1]
+    # matrix_preschool[2] = [val.values[0] for val in matrix_preschool[2]]
     preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
     preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
     preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
     matrix_primary = Graphs_matrix[2]
+    # matrix_primary[2] = [val.values[0] for val in matrix_primary[2]]
     primary_row = np.asarray(np2.asarray(matrix_primary[0]))
     primary_col = np.asarray(np2.asarray(matrix_primary[1]))
     primary_data = np.asarray(np2.asarray(matrix_primary[2]))
 
     matrix_highschool = Graphs_matrix[3]
+    # matrix_highschool[2] = [val.values[0] for val in matrix_highschool[2]]
     highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
     highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
     highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
     matrix_work = Graphs_matrix[4]
+    # matrix_work[2] = [val.values[0] for val in matrix_work[2]]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
     matrix_community = Graphs_matrix[5]
+    # matrix_community[2] = [val.values[0] for val in matrix_community[2]]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))
@@ -175,31 +187,37 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
 
     # load networks
     matrix_household = Graphs_matrix[0]
+    # matrix_household[2] = [val.values[0] for val in matrix_household[2]]
     hh_row = np.asarray(np2.asarray(matrix_household[0]))
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
     matrix_preschool = Graphs_matrix[1]
+    # matrix_preschool[2] = [val.values[0] for val in matrix_preschool[2]]
     preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
     preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
     preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
 
     matrix_primary = Graphs_matrix[2]
+    # matrix_primary[2] = [val.values[0] for val in matrix_primary[2]]
     primary_row = np.asarray(np2.asarray(matrix_primary[0]))
     primary_col = np.asarray(np2.asarray(matrix_primary[1]))
     primary_data = np.asarray(np2.asarray(matrix_primary[2]))
 
     matrix_highschool = Graphs_matrix[3]
+    # matrix_highschool[2] = [val.values[0] for val in matrix_highschool[2]]
     highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
     highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
     highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
 
     matrix_work = Graphs_matrix[4]
+    # matrix_work[2] = [val.values[0] for val in matrix_work[2]]
     work_row = np.asarray(np2.asarray(matrix_work[0]))
     work_col = np.asarray(np2.asarray(matrix_work[1]))
     work_data = np.asarray(np2.asarray(matrix_work[2]))
 
     matrix_community = Graphs_matrix[5]
+    # matrix_community[2] = [val.values[0] for val in matrix_community[2]]
     comm_row = np.asarray(np2.asarray(matrix_community[0]))
     comm_col = np.asarray(np2.asarray(matrix_community[1]))
     comm_data = np.asarray(np2.asarray(matrix_community[2]))

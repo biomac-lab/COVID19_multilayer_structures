@@ -11,7 +11,7 @@ from models import model
 
 ### Config folders
 
-config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
+config_data = pd.read_csv('config.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
 results_path = config_data.loc['results_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]

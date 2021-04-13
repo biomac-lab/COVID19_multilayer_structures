@@ -8,7 +8,7 @@ from models import model
 
 ### Config folders
 
-config_data = pd.read_csv('configlin.csv', sep=',', header=None, index_col=0)
+config_data = pd.read_csv('config.csv', sep=',', header=None, index_col=0)
 figures_path = config_data.loc['figures_dir'][1]
 results_path = config_data.loc['results_old_dir'][1]
 ages_data_path = config_data.loc['bogota_age_data_dir'][1]
@@ -173,7 +173,7 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 
 intervention_effcs = [0.0,0.2,0.4,0.6]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
-school_caps        = [0.0,0.15,0.25,0.35,0.55,1.0]
+school_caps        = [0.0,0.15,0.25,0.35,0.55]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
 for i, inter_ in enumerate(intervention_effcs):
@@ -207,7 +207,7 @@ ax.set_title(r'Total deaths',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
 #plt.show()
-save_path = os.path.join(figures_path,'point_plots','totalDeaths_n_{}.png'.format(str(pop)))
+save_path = os.path.join(figures_path,'point_plots','totalDeaths_n_{}_55.png'.format(str(pop)))
 plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
 
 
@@ -222,7 +222,7 @@ plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches
 
 intervention_effcs = [0.0,0.2,0.4,0.6]
 interv_legend_label = [r'$0\%$ intervention efficiency',r'$20\%$ intervention efficiency',r'$40\%$ intervention efficiency',r'$60\%$ intervention efficiency'] #,r'No intervention, schools $100\%$ occupation']
-school_caps        = [0.0,0.15,0.25,0.35,0.55,1.0]
+school_caps        = [0.0,0.15,0.25,0.35,0.55]
 states_ = ['S', 'E', 'I1', 'I2', 'I3', 'D', 'R']
 df_list = []
 for i, inter_ in enumerate(intervention_effcs):
@@ -256,5 +256,5 @@ ax.set_title(r'Total infections',fontsize=17)
 plt.xticks(size=17)
 plt.yticks(size=17)
 #plt.show()
-save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}.png'.format(str(pop)))
+save_path = os.path.join(figures_path,'point_plots','totalInfections_n_{}_55.png'.format(str(pop)))
 plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
