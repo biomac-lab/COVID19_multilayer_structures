@@ -8,4 +8,5 @@ bogota_age_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_st
 bogota_houses_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/HousesCensusBOG.CSV
 bogota_teachers_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/teachers/teacher_level_distribution_bogota.csv
 bogota_params_ages_data,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/params.csv
+colombia_schools_data_dir,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/data/establecimientos_educativos.csv
 results_values,/Users/samueltorres/Documents/Projects/COVID19_multilayer_structures/values

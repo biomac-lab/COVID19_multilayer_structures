@@ -691,11 +691,7 @@ fig,ax = plt.subplots(1,1,figsize=(7, 6))
 sns.pointplot(ax=ax, data=df_end_D, x='school_cap', y='end_cases', hue='interven_eff', linestyles='',palette='viridis',alpha=0.5)
 ax.legend(bbox_to_anchor=(1.02,1)).set_title('')
 plt.setp(ax.get_legend().get_texts(), fontsize='17') # for legend text
-ax.set_xlabel(r'School capacity ($\%$)',fontsize=17)
-ax.set_ylabel(r'Deaths ($\%$)',fontsize=17)
-ax.set_title(r'Total deaths | 80% using {} masks, high ventilation'.format(mask),fontsize=17)
-plt.xticks(size=17)
-plt.yticks(size=17)
+2
 # plt.show()
 save_path = os.path.join(figures_path,'point_plots','HV_totalDeaths_08_mask_{}_n_{}.png'.format(mask,str(pop)))
 plt.savefig(save_path,dpi=400, transparent=True, bbox_inches='tight', pad_inches=0.1 )
