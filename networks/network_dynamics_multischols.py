@@ -6,7 +6,7 @@ from jax import random
 
 ### Intervention functions
 
-def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9):
+def morning_set_intervention_ms(Graphs_matrix, intervention_eff, hh_occupation=0.9):
 
     # load networks
     matrix_household = Graphs_matrix[0]
@@ -15,23 +15,44 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
     hh_col = np.asarray(np2.asarray(matrix_household[1]))
     hh_data = np.asarray(np2.asarray(matrix_household[2]))
 
-    matrix_preschool = Graphs_matrix[1]
-    # matrix_preschool[2] = [val.values[0] for val in matrix_preschool[2]]
-    preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
-    preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
-    preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
+    lst_matrix_preschool = Graphs_matrix[1]
+    lst_prschol_row = []
+    lst_prschol_col = []
+    lst_prschol_data = []
+    for n_school, matrix_preschool in enumerate(lst_matrix_preschool):
+        # matrix_preschool[2] = [val.values[0] for val in matrix_preschool[2]]
+        preschl_row = np.asarray(np2.asarray(matrix_preschool[0]))
+        preschl_col = np.asarray(np2.asarray(matrix_preschool[1]))
+        preschl_data = np.asarray(np2.asarray(matrix_preschool[2]))
+        lst_prschol_row.append(preschl_row)
+        lst_prschol_col.append(preschl_col)
+        lst_prschol_data.append(preschl_data)
 
-    matrix_primary = Graphs_matrix[2]
-    # matrix_primary[2] = [val.values[0] for val in matrix_primary[2]]
-    primary_row = np.asarray(np2.asarray(matrix_primary[0]))
-    primary_col = np.asarray(np2.asarray(matrix_primary[1]))
-    primary_data = np.asarray(np2.asarray(matrix_primary[2]))
+    lst_matrix_primary = Graphs_matrix[2]
+    lst_primary_row = []
+    lst_primary_col = []
+    lst_primary_data = []
+    for n_school, matrix_primary in enumerate(lst_matrix_primary):
+        # matrix_primary[2] = [val.values[0] for val in matrix_primary[2]]
+        preschl_row = np.asarray(np2.asarray(matrix_primary[0]))
+        preschl_col = np.asarray(np2.asarray(matrix_primary[1]))
+        preschl_data = np.asarray(np2.asarray(matrix_primary[2]))
+        lst_primary_row.append(preschl_row)
+        lst_primary_col.append(preschl_col)
+        lst_primary_data.append(preschl_data)
 
-    matrix_highschool = Graphs_matrix[3]
-    # matrix_highschool[2] = [val.values[0] for val in matrix_highschool[2]]
-    highschl_row = np.asarray(np2.asarray(matrix_highschool[0]))
-    highschl_col = np.asarray(np2.asarray(matrix_highschool[1]))
-    highschl_data = np.asarray(np2.asarray(matrix_highschool[2]))
+    lst_matrix_highschool = Graphs_matrix[2]
+    lst_highschl_row = []
+    lst_highschl_col = []
+    lst_highschl_data = []
+    for n_school, matrix_highschl in enumerate(lst_matrix_highschool):
+        # matrix_highschl[2] = [val.values[0] for val in matrix_highschl[2]]
+        preschl_row = np.asarray(np2.asarray(matrix_highschl[0]))
+        preschl_col = np.asarray(np2.asarray(matrix_highschl[1]))
+        preschl_data = np.asarray(np2.asarray(matrix_highschl[2]))
+        lst_highschl_row.append(preschl_row)
+        lst_highschl_col.append(preschl_col)
+        lst_highschl_data.append(preschl_data)
 
     matrix_work = Graphs_matrix[4]
     # matrix_work[2] = [val.values[0] for val in matrix_work[2]]
@@ -81,7 +102,7 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
 
 
 def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_occupation,
-                         schl_altern=False, hh_occupation=0.3):
+                         schl_altern=False, hh_occupation=0.3, comm_occupation=0.2):
     # load networks
     matrix_household = Graphs_matrix[0]
     # matrix_household[2] = [val.values[0] for val in matrix_household[2]]
@@ -276,7 +297,7 @@ def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,schools_day_
     n_day = int(steps_per_days*(partitions[2]/24))
     days_intervals = [m_day, e_day, n_day]
 
-    m_w_interv = morning_set_intervention(Graphs_matrix,interv_glob)
+    m_w_interv = morning_set_intervention_ms(Graphs_matrix,interv_glob)
     e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation)
     e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=schl_occupation,work_occupation=work_occupation)
     n_w_interv = night_set_intervention(Graphs_matrix,interv_glob)
@@ -318,7 +339,7 @@ def create_day_intervention_altern_schools_dynamics(Graphs_matrix,Tmax,total_ste
     n_day = int(steps_per_days*(partitions[2]/24))
     days_intervals = [m_day, e_day, n_day]
 
-    m_w_interv = morning_set_intervention(Graphs_matrix,interv_glob)
+    m_w_interv = morning_set_intervention_ms(Graphs_matrix,interv_glob)
     e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation)
     e_w_interv_schl_open_set1  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation,work_occupation)
     e_w_interv_schl_open_set2  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation,work_occupation)

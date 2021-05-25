@@ -81,7 +81,7 @@ def morning_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.9)
 
 
 def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_occupation,
-                         schl_altern=False, hh_occupation=0.3):
+                         comm_occupation, hh_occupation=0.3):
     # load networks
     matrix_household = Graphs_matrix[0]
     # matrix_household[2] = [val.values[0] for val in matrix_household[2]]
@@ -121,7 +121,7 @@ def day_set_intervention(Graphs_matrix, intervention_eff, schl_occupation, work_
 
     # turn off portions of households and community
     hh_occupation_intervention = hh_occupation*(1-intervention_eff)
-    comm_occupation = 1-hh_occupation
+    #comm_occupation = 1-hh_occupation
     comm_occupation_intervention = comm_occupation*(1-intervention_eff)
 
     length = int(hh_data.shape[0]/2)
@@ -257,7 +257,7 @@ def night_set_intervention(Graphs_matrix, intervention_eff, hh_occupation=0.7):
 
 
 def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,schools_day_open,interv_glob,
-                                     schl_occupation,work_occupation,partitions=[8,8,8]):
+                                     schl_occupation,work_occupation,comm_occupation,partitions=[8,8,8]):
     '''
     A day is devided in 3 partitions with consists of sets of hours over a day
     partition[0] -> morning: only a % of households and community is activated
@@ -277,8 +277,8 @@ def create_day_intervention_dynamics(Graphs_matrix,Tmax,total_steps,schools_day_
     days_intervals = [m_day, e_day, n_day]
 
     m_w_interv = morning_set_intervention(Graphs_matrix,interv_glob)
-    e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation)
-    e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=schl_occupation,work_occupation=work_occupation)
+    e_w_interv_schl_close = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=0,work_occupation=work_occupation,comm_occupation=comm_occupation)
+    e_w_interv_schl_open  = day_set_intervention(Graphs_matrix,interv_glob,schl_occupation=schl_occupation,work_occupation=work_occupation,comm_occupation=comm_occupation)
     n_w_interv = night_set_intervention(Graphs_matrix,interv_glob)
 
     w_interv_intervals_schl_close = [m_w_interv,e_w_interv_schl_close,n_w_interv]
